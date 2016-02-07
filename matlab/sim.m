@@ -11,22 +11,35 @@ function result = sim()
     %Randomly generate size
     a = 10;
     b = 20;
-    m = round(a + (b-a).*rand(1))
-    n = round(a + (b-a).*rand(1))
+    m = round(a + (b-a).*rand(1));
+    n = round(a + (b-a).*rand(1));
 
     %Start with empty board, B
-    B = zeros(m,n)
+    B = zeros(m,n);
 
     %Game parameters
-    snakeLength = 4
-    numSnakes = 2
+    snakeLength = 4;
+    numSnakes = 3;
+    assert(mod(numSnakes,2)==0,'Number of snakes must be even')
     
-    %Randomly pick starting positions
-    startLocations = zeros(numSnakes,2)
-    for idx = 1 : numSnakes
-        [x,y] = generateStartLocations(m,n)
-       startLocations(idx,:) = [x,y]
-    end
+    
+    
+    
+%     
+%     %Randomly pick starting positions
+%     startLocations = zeros(numSnakes,2)
+%     for idx = 1 : numSnakes
+%         [x,y] = generateStartLocations(m,n)
+%        startLocations(idx,:) = [x,y]
+%     end
+%     
+%     %Randomly pick tail locations (observing length constraint)
+%     startLocations = zeros(numSnakes,2)
+%     for idx = 1 : numSnakes
+%         [x0,y0] = startLocations(idx,:)
+%         [x,y] = generateStartLocations(x0-snakeLength,x0+snakeLength)
+%        startLocations(idx,:) = [x,y]
+%     end
 end
 
 function result = uniformRandomInt(a,b)
