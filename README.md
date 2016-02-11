@@ -1,11 +1,5 @@
 # battlesnake-python
 
-A simple [BattleSnake AI](http://battlesnake.io) written in Python. 
-
-Visit [battlesnake.io/readme](http://battlesnake.io/readme) for API documentation and instructions for running your AI.
-
-This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/index.html) to serve requests and the [gunicorn web server](http://gunicorn.org/) for running bottle on Heroku. Dependencies are listed in [requirements.txt](requirements.txt).
-
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 #### You will need...
@@ -13,6 +7,7 @@ This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/inde
 * a working Python 2.7 development environment ([getting started guide](http://hackercodex.com/guide/python-development-environment-on-mac-osx/))
 * experience [deploying Python apps to Heroku](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
 * [pip](https://pip.pypa.io/en/latest/installing.html) to install Python dependencies
+* redis
 
 ## Running the Snake Locally
 
@@ -30,6 +25,8 @@ pip install -r requirements.txt
 
 4) Run local server:
 ```
+redis-server
+
 python app/main.py
 ```
 
@@ -58,6 +55,9 @@ or visit [http://APP_NAME.herokuapp.com](http://APP_NAME.herokuapp.com).
 heroku logs --tail
 ```
 
-## Questions?
+## Phases
+The snake has three phases, and are managed in our redis db.
 
-Email [battlesnake@sendwithus.com](mailto:battlesnake@sendwithus.com), or tweet [@send_with_us](http://twitter.com/send_with_us).
+1) hiding - the snake is attempting to hide in on of the corners
+2) circle - the snake is currently circling in one of the board corners
+3) food - the snake is currently getting food

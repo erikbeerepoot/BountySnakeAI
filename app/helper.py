@@ -84,12 +84,10 @@ def a_star(grid, goal, start):
 
 def getCorner():
     #TODO: For each corner, check surrounding area for snakes, pick best corner relative to position
-
     return
 
 def getFood():
     #TODO similar to getCorner, find best food location
-
     return
 
 def hide(width, height, snakes, head):
