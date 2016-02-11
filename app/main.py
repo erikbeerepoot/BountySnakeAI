@@ -1,10 +1,10 @@
-import bottle, os, redis
+import bottle, os, random, redis
 
 import helper
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 snakeName = 'Workday'
-
+taunts = ["We're winning"]
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
 
@@ -60,7 +60,7 @@ RESPONSE:
 def start():
     data = bottle.request.json
 
-    db.hmset(data.game, {'phase':'hide'}) #at game start, default to hide phase
+    db.hmset(data['game'], {'phase':'hide'}) #at game start, default to hide phase
 
     # TODO:
     # Initialize phase 1: hide
@@ -97,33 +97,29 @@ RESPONSE:
 def move():
     #TODO: data validation
     data = bottle.request.json
-    gameData = db.hgetall(data.game)
-
+    gameData = db.hgetall(data['game'])
     if (not gameData):
         #TODO: Someone has hit this endpoint before hitting /start, or something else is wrong..
         return
 
-    snake = getSnake(data.snakes)
-    if (snake is False):
+    player = getSnake(data['snakes'])
+    if (player is False):
         #TODO: error
         return {
             'move': 'north',
-            'taunt': 'battlesnake-python!'
+            'taunt': random.choice(taunts)
         }
 
-    if (snake.health < threshold(data.board)):
-        print 'yo'
-        #get food
+    if (player['health'] < threshold(data['board'])):
+        move = helper.getFood(data['board']['width'], data['board']['height'], data['snakes'], player, data['food'])
     elif (gameData['phase'] is 'circle'):
-        #already circling
-        print 'circling'
+        move = helper.circle(data['board']['width'], data['board']['height'], data['snakes'], player):
     else:
-        #continue hiding
-        print 'hiding. Attempting to circle once corner is reached'
+        move = helper.hide(data['board']['width'], data['board']['height'], data['snakes'], player):
 
     return {
-        'move': 'north',
-        'taunt': 'battlesnake-python!'
+        'move': move,
+        'taunt': random.choice(taunts)
     }
 
 '''
@@ -150,7 +146,7 @@ RESPONSE:
 @bottle.post('/end')
 def end():
     data = bottle.request.json
-    db.delete(data.game)
+    db.delete(data['game'])
 
     return {
         'taunt': 'Later!'

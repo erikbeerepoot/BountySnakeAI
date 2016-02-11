@@ -83,23 +83,24 @@ def a_star(grid, goal, start):
 
 
 def getCorner():
-    #TODO: For each corner, check surrounding area for snakes, pick best corner relative to position
+    #TODO: For each corner, check surrounding area for snakes, pick best corner relative to position to pass to A*
     return
 
 def getFood():
-    #TODO similar to getCorner, find best food location
+    #TODO Find best food location to pass to A*
     return
 
-def hide(width, height, snakes, head):
+def hide(width, height, snakes, player): #player is our snake
     grid = build_grid(width, height, snakes)
     goal = getCorner()
-    move = a_star(grid, goal, head)
+    move = a_star(grid, goal, player['coords'][0])
 
-def getFood(grid, width, height, head, food):
+def getFood(width, height, snakes, player, food):
     grid = build_grid(width, height, snakes)
     goal = getFood()
-    move = a_star(grid, goal, head)
+    move = a_star(grid, goal, player['coords'][0])
 
-def circle(grid, width, height, snake):
-    length = len(snake.coords)
+def circle(width, height, snakes, player):
+    grid = build_grid(width, height, snakes)
+    length = len(player['coords'])
     # our snake should be turning every length/4 squares
