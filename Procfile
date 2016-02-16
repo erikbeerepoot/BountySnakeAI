@@ -1,1 +1,1 @@
-web: gunicorn app.main:application
+web: gunicorn bountysnakeai.main:application
