@@ -32,10 +32,40 @@ def build_grid(width, height, snakes):
 
     return grid
 
-def children(point,grid):
-    x,y = point.point
-    links = [grid[d[0]][d[1]] for d in [(x-1, y),(x,y - 1),(x,y + 1),(x+1,y)]]
-    return [link for link in links if link.value != '%'] # return coordinate if not a snake wall, ie. '%'
+def children(node, grid):
+    """
+    Return a list of 'child' nodes within the grid.
+
+    Child nodes are defined to be:
+    a) inside the grid
+    b) directly above, below, left, or right of the given node
+    c) not occupied by a snake
+    """
+    # Check that this isn't a dimensionless grid
+    width = len(grid)
+    if width == 0: return []
+    height = len(grid[0])
+    if height == 0: return []
+
+    x, y = node.point
+    neighbouring_points = [
+        point
+        for point in [
+            # Left, below, above, right
+            (x-1, y), (x, y-1), (x, y+1), (x+1, y)
+        ]
+        # Filter out points that are out of bounds
+        if 0 <= point[0] < width
+        and 0 <= point[1] < height
+    ]
+    child_nodes = [
+        node for node in [
+            grid[x_1][y_1] for x_1, y_1 in neighbouring_points
+        ]
+        # Filter out nodes that are occupied by a snake
+        if node.value != '%'
+    ]
+    return child_nodes
 
 def manhattan(point,point2):
     return abs(point.point[0] - point2.point[0]) + abs(point.point[1]-point2.point[0])
