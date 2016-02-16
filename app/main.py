@@ -113,9 +113,9 @@ def move():
     if (player['health'] < threshold(data['board'])):
         move = helper.getFood(data['board']['width'], data['board']['height'], data['snakes'], player, data['food'])
     elif (gameData['phase'] is 'circle'):
-        move = helper.circle(data['board']['width'], data['board']['height'], data['snakes'], player):
+        move = helper.circle(data['board']['width'], data['board']['height'], data['snakes'], player)
     else:
-        move = helper.hide(data['board']['width'], data['board']['height'], data['snakes'], player):
+        move = helper.hide(data['board']['width'], data['board']['height'], data['snakes'], player)
 
     return {
         'move': move,
