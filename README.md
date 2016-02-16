@@ -32,6 +32,11 @@ python -m bountysnakeai.main
 
 5) Test client in your browser: [http://localhost:8080](http://localhost:8080).
 
+5b) Run test suite:
+```
+nosetests -v
+```
+
 ## Deploying to Heroku
 
 1) Create a new Heroku app:
