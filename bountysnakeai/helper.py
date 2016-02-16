@@ -10,6 +10,13 @@ class Node(object):
     def move_cost(self,other):
         return self.value
 
+    def __eq__(self, other):
+        # Define equivalence as occupying the same coordinates
+        if isinstance(other, Node):
+            return self.point == other.point
+        else:
+            return False
+
     def __repr__(self):
         return u'Node(%r, %r, parent=%r, H=%r, G=%r)' % (
             self.value,
