@@ -18,16 +18,16 @@
 git clone git@github.com:username/battlesnake-python.git
 ```
 
-3) Install dependencies using [pip](https://pip.pypa.io/en/latest/installing.html):
+3) Install dependencies and set up current dir as a package dir, using [pip](https://pip.pypa.io/en/latest/installing.html):
 ```
-pip install -r requirements.txt
+pip install -e . -r requirements.txt
 ```
 
 4) Run local server:
 ```
 redis-server
 
-python app/main.py
+python -m bountysnakeai.main
 ```
 
 5) Test client in your browser: [http://localhost:8080](http://localhost:8080).
