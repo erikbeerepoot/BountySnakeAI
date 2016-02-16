@@ -39,11 +39,11 @@ def build_grid(width, height, snakes):
 
     return grid
 
-def children(node, grid):
+def neighbours(node, grid):
     """
-    Return a list of 'child' nodes within the grid.
+    Return a list of neighbour nodes within the grid.
 
-    Child nodes are defined to be:
+    Neighbour nodes are defined to be:
     a) inside the grid
     b) directly above, below, left, or right of the given node
     c) not occupied by a snake
@@ -65,14 +65,14 @@ def children(node, grid):
         if 0 <= point[0] < width
         and 0 <= point[1] < height
     ]
-    child_nodes = [
+    neighbouring_nodes = [
         node for node in [
             grid[x_1][y_1] for x_1, y_1 in neighbouring_points
         ]
         # Filter out nodes that are occupied by a snake
         if node.value != '%'
     ]
-    return child_nodes
+    return neighbouring_nodes
 
 def manhattan(point,point2):
     return abs(point.point[0] - point2.point[0]) + abs(point.point[1]-point2.point[0])
@@ -81,47 +81,59 @@ def manhattan(point,point2):
 def a_star(grid, goal, start):
     openset = set() #nodes we are currently examining
     closedset = set() #nodes we have eliminated
-    #Current point is the starting point
-    current = start
-    #Add the starting point to the open set
-    openset.add(current)
-    #While the open set is not empty
+
+    # Add the starting point to the open set
+    openset.add(start)
+
+    # f_score is the sum of g_score + h_score
+    f_score = lambda node: node.G + node.H
+
+    # While there are still nodes that are reachable but haven't been visited...
     while openset:
-        #Find the item in the open set with the lowest G + H score
-        current = min(openset, key=lambda o:o.G + o.H)
-        #If it is the item we want, retrace the path and return it
+
+        # Find the node in the open set with the lowest f_score
+        current = min(openset, key=f_score)
+
+        # If we've reached the destination node, retrace the path we took
+        # and return it.
         if current == goal:
+            # Follow from the path of parents from goal->start
             path = []
             while current.parent:
                 path.append(current)
                 current = current.parent
             path.append(current)
+            # Reverse the list so it goes start->goal
             return path[::-1]
 
-        #Remove the item from the open set
+        # This node has been visited. Mark it as such.
         openset.remove(current)
-        #Add it to the closed set
         closedset.add(current)
-        #Loop through the node's children/siblings
-        for node in children(current,grid):
-            #If it is already in the closed set, skip it
+
+        # For all neighbour nodes of the current node...
+        for node in neighbours(current, grid):
+
             if node in closedset:
+                # If we've already visited this node, skip it
                 continue
-            #Otherwise if it is already in the open set
-            if node in openset:
-                #Check if we beat the G score
+
+            elif node in openset:
+                # If we've already found a path to this node, check if the
+                # path we've just followed is shorter and, if it is, update the
+                # optimal g_score and optimal parent/path.
                 new_g = current.G + current.move_cost(node)
                 if node.G > new_g:
-                    #If so, update the node to have a new parent
                     node.G = new_g
                     node.parent = current
             else:
-                #If it isn't in the open set, calculate the G and H score for the node
+                # If this is the first time we've found a path to this node,
+                # calculate the initial g_score and h_score, and update the
+                # optimal g_score and optimal parent/path.
                 node.G = current.G + current.move_cost(node)
                 node.H = manhattan(node, goal)
-                #Set the parent to our current item
                 node.parent = current
-                #Add it to the set
+
+                # Add this to the set of reachable nodes to visit in the future
                 openset.add(node)
 
     #Throw an exception if there is no path
