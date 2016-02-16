@@ -1,6 +1,6 @@
 
-class Node:
-    def __init__(self,value,point):
+class Node(object):
+    def __init__(self, value, point):
         self.value = value
         self.point = point
         self.parent = None
