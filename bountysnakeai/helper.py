@@ -1,13 +1,23 @@
 
 class Node(object):
-    def __init__(self, value, point):
+    def __init__(self, value, point, parent=None, H=0, G=0):
         self.value = value
         self.point = point
-        self.parent = None
-        self.H = 0
-        self.G = 0
+        self.parent = parent
+        self.H = H
+        self.G = G
+
     def move_cost(self,other):
         return self.value
+
+    def __repr__(self):
+        return u'Node(%r, %r, parent=%r, H=%r, G=%r)' % (
+            self.value,
+            self.point,
+            self.parent if self.parent is None else 'Node(...)',
+            self.H,
+            self.G,
+        )
 
 def build_grid(width, height, snakes):
     grid = [[0 for x in range(height)] for x in range(width)]
