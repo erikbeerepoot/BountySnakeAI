@@ -18,7 +18,7 @@ Board = namedtuple(u'Board', [
 
 def int_array(width, height, default_value):
     # XXX: Return a two-dimensional array of signed 64-bit ints
-    return numpy.full((width, height), default_value, dtype=numpy.int64)
+    return numpy.full((width*height,), default_value, dtype=numpy.int64)
 
 max_int = numpy.iinfo(numpy.int64).max
 

@@ -37,9 +37,10 @@ def print_path(board, path):
     for y in range(0, board.height):
         line = ['|']
         for x in range(0, board.width):
-            if board.snake_grid[x][y] != -1:
-                line.append(board.snake_grid[x][y])
-            elif board.food_grid[x][y]:
+            offset = x*board.width + y
+            if board.snake_grid[offset] != -1:
+                line.append(board.snake_grid[offset])
+            elif board.food_grid[offset]:
                 line.append('.')
             elif Point(x, y) in path:
                 line.append('o')
