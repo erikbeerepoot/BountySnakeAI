@@ -17,22 +17,16 @@ class TestAStar(TestCase):
             ],
         ]
 
-        start = Node(1, (1,1))
-        goal = Node(1, (0,0))
+        start = Node(1, (0,0))
+        goal = Node(1, (1,1))
 
         result = helper.a_star(grid, goal, start)
 
-        # There are two valid paths to the goal and our algorithm is
-        # non-deterministic, so check both!
-        self.assertIn(result, [
-            [
-                Node(1, (1, 1)),
-                Node(1, (1, 0)),
-                Node(1, (0, 0)),
-            ],
-            [
-                Node(1, (1, 1)),
-                Node(1, (0, 1)),
-                Node(1, (0, 0)),
-            ],
+        # To get from position (0, 0) to position (W, H) on a grid, there are
+        # (W+H choose W) equivalently good paths. Our algorithm is biased,
+        # though, so we know it will always pick this one, in this case:
+        self.assertEqual(result, [
+            Node(1, (0, 0)),
+            Node(1, (0, 1)),
+            Node(1, (1, 1)),
         ])

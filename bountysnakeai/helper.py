@@ -86,7 +86,11 @@ def a_star(grid, goal, start):
     openset.add(start)
 
     # f_score is the sum of g_score + h_score
-    f_score = lambda node: node.G + node.H
+    # HACK: In order to make our ordering deterministic, we want to sort first
+    #       by f_score, then by x and y coordinates. This will bias our paths
+    #       to prefer those that move toward the origin of the grid, even when
+    #       another direction would be equivalent, but it makes testing easier.
+    f_score = lambda node: (node.G + node.H, node.point[0], node.point[1])
 
     # While there are still nodes that are reachable but haven't been visited...
     while openset:
