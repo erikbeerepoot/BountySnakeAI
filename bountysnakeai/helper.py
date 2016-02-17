@@ -28,3 +28,33 @@ def circle(width, height, snakes, player):
     board = build_board(width, height, snakes, food)
     length = len(player['coords'])
     # our snake should be turning every length/4 squares
+
+def print_path(board, path):
+    path = set(path)
+    output = []
+    line = ['+', '-'*(board.width*2+1), '+']
+    output.append(''.join(line))
+    for y in range(0, board.height):
+        line = ['|']
+        for x in range(0, board.width):
+            if board.snake_grid[x][y] != -1:
+                line.append(board.snake_grid[x][y])
+            elif board.food_grid[x][y]:
+                line.append('.')
+            elif Point(x, y) in path:
+                line.append('o')
+            else:
+                line.append(' ')
+        line.append('|')
+        output.append(' '.join(line))
+    line = ['+', '-'*(board.width*2+1), '+']
+    output.append(''.join(line))
+    print '\n'.join(output)
+
+def blah():
+    board = build_board(20, 20, [], [])
+    path = a_star(board, Point(2,4), Point(18, 17))
+    print_path(board, path)
+
+    path = a_star(board, Point(1,11), Point(11, 3))
+    print_path(board, path)
