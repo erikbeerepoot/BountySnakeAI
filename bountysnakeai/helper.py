@@ -52,9 +52,21 @@ def print_path(board, path):
     print '\n'.join(output)
 
 def blah():
-    board = build_board(20, 20, [], [])
-    path = a_star(board, Point(2,4), Point(18, 17))
-    print_path(board, path)
+    for i in xrange(0, 1000):
+        board = build_board(20, 20, [], [])
+        path = a_star(board, Point(2,4), Point(18, 17))
+        #print_path(board, path)
 
-    path = a_star(board, Point(1,11), Point(11, 3))
-    print_path(board, path)
+        path = a_star(board, Point(1,11), Point(11, 3))
+        #print_path(board, path)
+
+if __name__ == '__main__':
+    from line_profiler import LineProfiler
+    try:
+        profiler = LineProfiler()
+        profiler.add_function(blah)
+        profiler.add_function(a_star)
+        profiler.enable_by_count()
+        blah()
+    finally:
+        profiler.print_stats()
