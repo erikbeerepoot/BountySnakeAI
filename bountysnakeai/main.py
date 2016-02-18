@@ -103,12 +103,19 @@ def move():
             'taunt': random.choice(taunts)
         }
 
+    """
+    TODO: implement something like this...
+
     if (player['health'] < helper.threshold(data['board'])):
         move = helper.getFood(data['board']['width'], data['board']['height'], data['snakes'], player, data['food'])
     elif (gameData['phase'] is 'circle'):
         move = helper.circle(data['board']['width'], data['board']['height'], data['snakes'], player)
     else:
         move = helper.hide(data['board']['width'], data['board']['height'], data['snakes'], player)
+
+    BUT: until we have that ...
+    """
+    move = 'north'
 
     return {
         'move': move,
