@@ -44,7 +44,11 @@ def start():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
-    board_state = model.BoardState(json_dict)
+    try:
+        board_state = model.BoardState(json_dict)
+    except KeyError :
+        print("KeyError: We didn't get the dictionary we were excepting")
+
 
     # at game start, default to hide phase
     game_id = board_state.game
