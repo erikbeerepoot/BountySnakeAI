@@ -1,10 +1,10 @@
 from bountysnakeai.tests import TestCase
-from bountysnakeai import helper
+from bountysnakeai import a_star
 
 class TestAStar(TestCase):
 
     def test_2x2(self):
-        Node = helper.Node
+        Node = a_star.Node
 
         grid = [
             [
@@ -20,12 +20,12 @@ class TestAStar(TestCase):
         start = Node(1, (0,0))
         goal = Node(1, (1,1))
 
-        result = helper.a_star(grid, goal, start)
+        path = a_star.find_path(grid, goal, start)
 
         # To get from position (0, 0) to position (W, H) on a grid, there are
         # (W+H choose W) equivalently good paths. Our algorithm is biased,
         # though, so we know it will always pick this one, in this case:
-        self.assertEqual(result, [
+        self.assertEqual(path, [
             Node(1, (0, 0)),
             Node(1, (0, 1)),
             Node(1, (1, 1)),
