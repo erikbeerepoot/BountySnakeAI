@@ -5,6 +5,9 @@ FOOD = 2
 INFINITY = 2**32 - 1 # For simplicity, just use a very high number...
 
 class Node(object):
+    __slots__ = [
+        'x', 'y', 'contents', 'parent', 'H', 'G',
+    ]
     def __init__(self, x, y, contents=EMPTY):
         # Coordinates of this node on the board.
         self.x = x
@@ -53,8 +56,8 @@ class Node(object):
 
 def build_grid(width, height, snakes):
     grid = [
-        [Node(x, y) for y in range(height)]
-        for x in range(width)
+        [Node(x, y) for y in xrange(height)]
+        for x in xrange(width)
     ]
     for snake in snakes:
         for p in snake.coords:
