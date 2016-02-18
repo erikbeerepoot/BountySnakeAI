@@ -8,6 +8,8 @@ from bountysnakeai import helper
 from bountysnakeai import model
 
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = [u"We're winning"]
