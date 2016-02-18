@@ -40,6 +40,6 @@ class TestParsing(TestCase):
         self.assertEqual(bs.snake_list[0].name, "The first snaaaake")
         self.assertEqual(bs.snake_list[1].name, "Another snaaaaake")
         self.assertEqual(bs.food_list, [
-            model.Point(1, 2),
+            model.Point(1, 5),
             model.Point(9, 3),
         ])

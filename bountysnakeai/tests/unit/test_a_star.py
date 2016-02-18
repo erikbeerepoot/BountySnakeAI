@@ -41,7 +41,7 @@ class TestAStar(TestCase):
         json_dict = json.loads(example_json.dummy_game)
         bs = model.BoardState(json_dict)
 
-        grid = a_star.build_grid(bs.width, bs.height, bs.snake_list)
+        grid = a_star.build_grid(bs.width, bs.height, bs.snake_list, bs.food_list)
 
         Point = model.Point
         known_snake_positions = set([
@@ -49,7 +49,7 @@ class TestAStar(TestCase):
             Point(4, 4), Point(4, 3), Point(4, 2), Point(4, 1) # snake 2
         ])
         known_food_positions = set([
-            Point(1, 2), Point(9, 3),
+            Point(1, 5), Point(9, 3),
         ])
 
         for x in xrange(bs.width):

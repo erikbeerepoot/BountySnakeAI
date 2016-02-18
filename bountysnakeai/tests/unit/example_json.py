@@ -36,7 +36,7 @@ dummy_game = """{
         %s, %s
     ],
     "food": [
-        [1, 2], [9, 3]
+        [1, 5], [9, 3]
     ]
 }""" % (dummy_snake_1, dummy_snake_2)
 

@@ -74,7 +74,7 @@ class Node(object):
             '' if self.parent is None else 'Node(...)',
         )
 
-def build_grid(width, height, snakes):
+def build_grid(width, height, snakes, food):
     grid = [
         [Node(x, y) for y in xrange(height)]
         for x in xrange(width)
@@ -83,6 +83,12 @@ def build_grid(width, height, snakes):
         for p in snake.coords:
             node = grid[p.x][p.y]
             node.contents = SNAKE
+    for p in food:
+        node = grid[p.x][p.y]
+        # If we're overwriting a snake there's a problem. Ensure valid state:
+        assert node.contents == EMPTY
+        node.contents = FOOD
+
     return grid
 
 def neighbours(node, grid):
