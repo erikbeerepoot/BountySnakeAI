@@ -61,6 +61,50 @@ class TestAStar(TestCase):
             # We're stuck in a corner! This should throw an exception...
             path = a_star.find_path(grid, start, goal)
 
+    def test_4x4_obstructed_path(self):
+        Node = a_star.Node
+        SNAKE = a_star.SNAKE
+        grid = [
+            [
+                Node(0,0, contents=SNAKE), # our snake
+                Node(0,1, contents=SNAKE),
+                Node(0,2),
+                Node(0,3),
+            ],
+            [
+                Node(1,0),
+                Node(1,1),
+                Node(1,2),
+                Node(1,3),
+            ],
+            [
+                Node(2,0, contents=SNAKE),
+                Node(2,1, contents=SNAKE),
+                Node(2,2, contents=SNAKE), # their snake
+                Node(2,3),
+            ],
+            [
+                Node(3,0),
+                Node(3,1),
+                Node(3,2),
+                Node(3,3),
+            ],
+        ]
+        start = Node(0, 0)
+        goal = Node(3, 2)
+        path = a_star.find_path(grid, start, goal)
+        expected_path = [
+            Node(0, 0),
+            Node(1, 0),
+            Node(1, 1),
+            Node(1, 2),
+            Node(1, 3),
+            Node(2, 3), # notice we have to go around the obstacle
+            Node(3, 3), #
+            Node(3, 2), # and then curve back
+        ]
+        self.assertEquals(path, expected_path)
+
     def test_build_grid(self):
         # FIXME: Super bad form to something like this in a unit test, but
         #        it's fastest to code right now...
