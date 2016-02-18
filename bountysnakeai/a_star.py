@@ -130,6 +130,10 @@ def find_path(grid, start, goal):
     openset = set() #nodes we are currently examining
     closedset = set() #nodes we have eliminated
 
+    # Set the starting node's costs
+    start.G = 0
+    start.H = manhattan(start, goal)
+
     # Add the starting point to the open set
     openset.add(start)
     openheap = [start]
