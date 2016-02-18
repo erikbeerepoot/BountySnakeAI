@@ -32,6 +32,35 @@ class TestAStar(TestCase):
         # though, so we know it will stick as close to the axes as possible:
         self.assertEqual(path, expected_path)
 
+    def test_3x3_boxed_in(self):
+        Node = a_star.Node
+        SNAKE = a_star.SNAKE
+
+        grid = [
+            [
+                Node(0,0, contents=SNAKE), # our snake
+                Node(0,1, contents=SNAKE),
+                Node(0,2),
+            ],
+            [
+                Node(1,0, contents=SNAKE),
+                Node(1,1, contents=SNAKE), # their snake
+                Node(1,2),
+            ],
+            [
+                Node(2,0),
+                Node(2,1),
+                Node(2,2),
+            ],
+        ]
+
+        start = Node(0, 0)
+        goal = Node(2, 2)
+
+        with self.assertRaises(ValueError) as context:
+            # We're stuck in a corner! This should throw an exception...
+            path = a_star.find_path(grid, start, goal)
+
     def test_build_grid(self):
         # FIXME: Super bad form to something like this in a unit test, but
         #        it's fastest to code right now...
