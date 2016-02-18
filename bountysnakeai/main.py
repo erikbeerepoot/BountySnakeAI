@@ -10,15 +10,6 @@ taunts = ["We're winning"]
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
 
-def getSnake(snakes):
-    for snake in snakes:
-        if (snake['id'] is snakeID):
-            return snake
-    return False
-
-def threshold(board):
-    return (board['width'] * board['height'] / 4) #threshold is a quarter of the area of the board. This may need to change depending on how much food is available
-
 @bottle.route('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root='static/')
@@ -104,7 +95,7 @@ def move():
         #TODO: Someone has hit this endpoint before hitting /start, or something else is wrong..
         return
 
-    player = getSnake(data['snakes'])
+    player = helper.getSnake(data['snakes'], snakeID)
     if (player is False):
         #TODO: error
         return {
@@ -112,7 +103,7 @@ def move():
             'taunt': random.choice(taunts)
         }
 
-    if (player['health'] < threshold(data['board'])):
+    if (player['health'] < helper.threshold(data['board'])):
         move = helper.getFood(data['board']['width'], data['board']['height'], data['snakes'], player, data['food'])
     elif (gameData['phase'] is 'circle'):
         move = helper.circle(data['board']['width'], data['board']['height'], data['snakes'], player)
