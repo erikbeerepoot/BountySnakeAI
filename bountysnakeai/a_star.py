@@ -64,10 +64,10 @@ def build_grid(width, height, snakes):
 
 def neighbours(node, grid):
     """
-    Return a list of neighbour nodes within the grid.
+    Return a list of available neighbour nodes within the game board.
 
-    Neighbour nodes are defined to be:
-    a) inside the grid
+    Available neighbour nodes are defined to be:
+    a) inside the bounds of the board
     b) directly above, below, left, or right of the given node
     c) not occupied by a snake
     """
@@ -101,8 +101,11 @@ def neighbours(node, grid):
 def manhattan(node_a, node_b):
     return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
 
-# Grid of Nodes, goal coords, start coords
 def find_path(grid, goal, start):
+    """
+    Find the optimal path from the 'start' node to the 'goal' node within the
+    provided grid of nodes.
+    """
     openset = set() #nodes we are currently examining
     closedset = set() #nodes we have eliminated
 
@@ -117,7 +120,6 @@ def find_path(grid, goal, start):
 
     # While there are still nodes that are reachable but haven't been visited...
     while openset:
-
         # Find the node in the open set with the lowest f_score
         current = min(openset, key=f_score)
 
@@ -162,10 +164,5 @@ def find_path(grid, goal, start):
 
                 # Add this to the set of reachable nodes to visit in the future
                 openset.add(node)
-
-    #Throw an exception if there is no path
-    raise ValueError('No Path Found')
-    #TODO:  no path found...
-
-
-
+    else:
+        raise ValueError('No Path Found')
