@@ -1,28 +1,54 @@
-class Node(object):
-    def __init__(self, value, point, parent=None, H=0, G=0):
-        self.value = value
-        self.point = point
-        self.parent = parent
-        self.H = H
-        self.G = G
+EMPTY = 0
+SNAKE = 1
+FOOD = 2
 
-    def move_cost(self,other):
-        return self.value
+INFINITY = 2**32 - 1 # For simplicity, just use a very high number...
+
+class Node(object):
+    def __init__(self, x, y, contents=EMPTY):
+        # Coordinates of this node on the board.
+        self.x = x
+        self.y = y
+
+        # Does this node contain part of a snake? food? nothing?
+        self.contents = contents
+
+        # The last node we visited on the path to this node.
+        self.parent = None
+
+        # g is the sum of the costs accrued on the path from the start node to
+        # this node
+        self.H = INFINITY
+
+        # h is our guess as to how much it'll cost to reach the goal from this
+        # node (if our graph is a grid, a naive approach would be to use the
+        # manhattan distance as an estimate, for instance)
+        self.G = INFINITY
+
+    @property
+    def F(self):
+        return self.G + self.H
+
+    def move_cost(self, neighbour):
+        # Naively declare that it costs 1 to move from this node to any neighbour
+        # TODO: come up with a better heuristic for the move cost
+        return 1
 
     def __eq__(self, other):
         # Define equivalence as occupying the same coordinates
         if isinstance(other, Node):
-            return self.point == other.point
+            return self.x == other.x and self.y == other.y
         else:
             return False
 
     def __repr__(self):
-        return u'Node(%r, %r, parent=%r, H=%r, G=%r)' % (
-            self.value,
-            self.point,
-            self.parent if self.parent is None else 'Node(...)',
-            self.H,
-            self.G,
+        return u'Node(%r, %r)<cont=%r, H=%s, G=%s, parent=%s>' % (
+            self.x,
+            self.y,
+            self.contents,
+            'INF' if self.H >= INFINITY else self.H,
+            'INF' if self.G >= INFINITY else self.G,
+            '' if self.parent is None else 'Node(...)',
         )
 
 def build_grid(width, height, snakes):
@@ -30,11 +56,11 @@ def build_grid(width, height, snakes):
 
     for x in range(width):
         for y in range(height):
-            grid[x][y] = Node(1, (x,y))
+            grid[x][y] = Node(x, y)
 
     for snake in snakes:
         for coord in snake.coords:
-            grid[coord[0]][coord[1]] = Node('%', coord[0], coord[1])
+            grid[coord[0]][coord[1]] = Node(x, y, contents=SNAKE)
 
     return grid
 
@@ -53,7 +79,8 @@ def neighbours(node, grid):
     height = len(grid[0])
     if height == 0: return []
 
-    x, y = node.point
+    x = node.x
+    y = node.y
     neighbouring_points = [
         point
         for point in [
@@ -69,12 +96,12 @@ def neighbours(node, grid):
             grid[x_1][y_1] for x_1, y_1 in neighbouring_points
         ]
         # Filter out nodes that are occupied by a snake
-        if node.value != '%'
+        if node.contents != SNAKE
     ]
     return neighbouring_nodes
 
-def manhattan(point,point2):
-    return abs(point.point[0] - point2.point[0]) + abs(point.point[1]-point2.point[0])
+def manhattan(node_a, node_b):
+    return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
 
 # Grid of Nodes, goal coords, start coords
 def find_path(grid, goal, start):
@@ -84,12 +111,11 @@ def find_path(grid, goal, start):
     # Add the starting point to the open set
     openset.add(start)
 
-    # f_score is the sum of g_score + h_score
     # HACK: In order to make our ordering deterministic, we want to sort first
     #       by f_score, then by x and y coordinates. This will bias our paths
     #       to prefer those that move toward the origin of the grid, even when
     #       another direction would be equivalent, but it makes testing easier.
-    f_score = lambda node: (node.G + node.H, node.point[0], node.point[1])
+    f_score = lambda node: (node.F, node.x, node.y)
 
     # While there are still nodes that are reachable but haven't been visited...
     while openset:
