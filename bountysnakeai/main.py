@@ -7,7 +7,7 @@ from bountysnakeai import helper
 from bountysnakeai import model
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
-taunts = ["We're winning"]
+taunts = [u"We're winning"]
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
 
@@ -24,14 +24,14 @@ def index():
     """
     Serve up some basic style information for our snakes.
     """
-    head_url = '%s://%s/static/head.png' % (
+    head_url = u'%s://%s/static/head.png' % (
         bottle.request.urlparts.scheme,
         bottle.request.urlparts.netloc
     )
 
     return {
-        'color': '#3398CC',
-        'head': head_url
+        u'color': u'#3398CC',
+        u'head': head_url
     }
 
 
@@ -56,7 +56,7 @@ def start():
 
     # The game is about to start! Quick -- taunt the enemy!
     return {
-        'taunt': 'battlesnake-python!'
+        u'taunt': u'battlesnake-python!'
     }
 
 
@@ -98,11 +98,11 @@ def move():
 
     BUT: until we have that ...
     """
-    move = 'north'
+    move = u'north'
 
     return {
-        'move': move,
-        'taunt': random.choice(taunts)
+        u'move': move,
+        u'taunt': random.choice(taunts)
     }
 
 @bottle.post('/end')
@@ -123,7 +123,7 @@ def end():
 
     # The game is over -- taunt them one last time!
     return {
-        'taunt': 'Later!'
+        u'taunt': u'Later!'
     }
 
 
