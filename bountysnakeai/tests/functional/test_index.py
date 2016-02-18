@@ -1,11 +1,11 @@
 import json
 
+from bountysnakeai.tests import ControllerTestCase
 from bountysnakeai.tests import TestApp
-from bountysnakeai.tests import TestCase
 from bountysnakeai import main
 
 
-class TestIndex(TestCase):
+class TestIndex(ControllerTestCase):
     def test_index(self):
         app = TestApp(main.application)
         response = app.get('/')
