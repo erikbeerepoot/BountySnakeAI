@@ -121,9 +121,8 @@ def end():
     db.delete(game_id)
     # TODO: Make sure unauthorized calls aren't trying to delete a game state.
 
-    # The game is over -- taunt them one last time!
+    # The game is over -- any response will be ignored
     return {
-        u'taunt': u'Later!'
     }
 
 
