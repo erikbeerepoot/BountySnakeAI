@@ -1,10 +1,13 @@
 import bottle
+import logging
 import os
 import random
 import redis
 
 from bountysnakeai import helper
 from bountysnakeai import model
+
+log = logging.getLogger(__name__)
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = [u"We're winning"]
@@ -44,6 +47,7 @@ def start():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
+    log.debug(json_dict)
     board_state = model.BoardState(json_dict)
 
     # at game start, default to hide phase
@@ -69,6 +73,7 @@ def move():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
+    log.debug(json_dict)
     board_state = model.BoardState(json_dict)
 
     # Retrieve the stored game state
@@ -114,6 +119,7 @@ def end():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
+    log.debug(json_dict)
     board_state = model.BoardState(json_dict)
 
     # Delete the stored game state
