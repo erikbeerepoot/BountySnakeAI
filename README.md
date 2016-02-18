@@ -39,26 +39,9 @@ nosetests -v
 
 ## Deploying to Heroku
 
-1) Create a new Heroku app:
-```
-heroku create [APP_NAME]
-```
+This snake automatically deploys to heroku from master, and for each pull request. You can find it at:
 
-2) Deploy code to Heroku servers:
-```
-git push heroku master
-```
-
-3) Open Heroku app in browser:
-```
-heroku open
-```
-or visit [http://APP_NAME.herokuapp.com](http://APP_NAME.herokuapp.com).
-
-4) View server logs with the `heroku logs` command:
-```
-heroku logs --tail
-```
+` http://bsnake.herokuapp.com`
 
 ## Phases
 The snake has three phases, and are managed in our redis db.
