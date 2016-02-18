@@ -1,10 +1,12 @@
-from bountysnakeai import a_star
-
-def getSnake(snakes, snake_id):
-    for snake in snakes:
-        if (snake['id'] is snake_id):
+def getSnake(board_state, snake_id):
+    for snake in board_state.snake_list:
+        if snake.id == snake_id:
             return snake
     return None
 
-def threshold(board):
-    return (board['width'] * board['height'] / 4) #threshold is a quarter of the area of the board. This may need to change depending on how much food is available
+def health_threshold(board_state):
+    """
+    Return the 'threshold' of health below which our snake should go find food.
+    """
+    # XXX: This is a very naive heuristic.
+    return (board_state.width * board_state.height) // 4

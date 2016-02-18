@@ -4,6 +4,7 @@ import random
 import redis
 
 from bountysnakeai import helper
+from bountysnakeai import model
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = ["We're winning"]
@@ -12,11 +13,17 @@ db = redis.from_url(redis_url)
 
 @bottle.route('/static/<path:path>')
 def static(path):
+    """
+    Serve up static files.
+    """
     return bottle.static_file(path, root='static/')
 
 
 @bottle.get('/')
 def index():
+    """
+    Serve up some basic style information for our snakes.
+    """
     head_url = '%s://%s/static/head.png' % (
         bottle.request.urlparts.scheme,
         bottle.request.urlparts.netloc
@@ -27,91 +34,67 @@ def index():
         'head': head_url
     }
 
-'''
-REQUEST
-{
-    "game": "hairy-cheese",
-    "mode": "advanced",
-    "turn": 0,
-    "board": {
-        "height": 20,
-        "width": 30
-    },
-    "snakes": [
-        , , ...
-    ],
-    "food": []
-}
-
-RESPONSE:
-{
-    "taunt": "Let's rock!"
-}
-'''
 
 @bottle.post('/start')
 def start():
-    data = bottle.request.json
+    """
+    Initialize a new game.
 
-    db.hmset(data['game'], {'phase':'hide'}) #at game start, default to hide phase
+    Return a taunt.
+    """
+    # Parse the game state out of the request body
+    json_dict = bottle.request.json
+    board_state = model.BoardState(json_dict)
 
-    # TODO:
-    # Initialize phase 1: hide
+    # at game start, default to hide phase
+    game_id = board_state['game']
+    private_state = {
+        'phase': 'hide',
+    }
+    db.hmset(game_id, private_state)
+    # TODO: Make sure unauthorized calls aren't overwriting an existing game state.
 
+    # The game is about to start! Quick -- taunt the enemy!
     return {
         'taunt': 'battlesnake-python!'
     }
 
-'''
-REQUEST
-{
-    "game": "hairy-cheese",
-    "mode": "advanced",
-    "turn": 4,
-    "board": {
-        "height": 20,
-        "width": 30
-    },
-    "snakes": [
-        , , ...
-    ],
-    "food": [
-        [1, 2], [9, 3], ...
-    ]
-}
 
-RESPONSE:
-{
-   "move": "north",
-   "taunt": "To the north pole!!"
-}
-'''
 @bottle.post('/move')
 def move():
-    #TODO: data validation
-    data = bottle.request.json
-    gameData = db.hgetall(data['game'])
-    if (not gameData):
-        #TODO: Someone has hit this endpoint before hitting /start, or something else is wrong..
-        return
+    """
+    Process a 'move' on the game board.
 
-    player = helper.getSnake(data['snakes'], snakeID)
-    if (player is False):
-        #TODO: error
-        return {
-            'move': 'north',
-            'taunt': random.choice(taunts)
-        }
+    Return a direction to move in and a taunt.
+    """
+    # Parse the game state out of the request body
+    json_dict = bottle.request.json
+    board_state = model.BoardState(json_dict)
+
+    # Retrieve the stored game state
+    game_id = board_state['game']
+    private_state = db.hgetall(game_id)
+
+    # TODO: Make sure unauthorized calls aren't trying to predict our next move.
+
+    if (not private_state):
+        # Someone has hit this endpoint before hitting /start,
+        # or something else is wrong..
+        bottle.abort(404, u"Game ID %s not found" % game_id)
+
+    our_snake = helper.getSnake(board_state, snakeID)
+    if not our_snake:
+        bottle.abort(400, u"Bad Request: my snake is missing!")
 
     """
     TODO: implement something like this...
 
-    if (player['health'] < helper.threshold(data['board'])):
-        move = helper.getFood(data['board']['width'], data['board']['height'], data['snakes'], player, data['food'])
-    elif (gameData['phase'] is 'circle'):
-        move = helper.circle(data['board']['width'], data['board']['height'], data['snakes'], player)
+    if our_snake.health < helper.health_threshold(board_state):
+        move = helper.getFood(board_state, our_snake)
+    elif private_state['phase'] == 'circle':
+        move = helper.circle(board_state, our_snake)
     else:
-        move = helper.hide(data['board']['width'], data['board']['height'], data['snakes'], player)
+        move = helper.hide(board_state, our_snake)
 
     BUT: until we have that ...
     """
@@ -122,32 +105,23 @@ def move():
         'taunt': random.choice(taunts)
     }
 
-'''
-REQUEST
-{
-    "game": "hairy-cheese",
-    "mode": "advanced",
-    "turn": 4,
-    "board": {
-        "height": 20,
-        "width": 30
-    },
-    "snakes": [
-        , , ...
-    ],
-    "food": [
-        [1, 2], [9, 3], ...
-    ]
-}
-
-RESPONSE:
-200
-'''
 @bottle.post('/end')
 def end():
-    data = bottle.request.json
-    db.delete(data['game'])
+    """
+    End a game and clean up.
 
+    Return a taunt.
+    """
+    # Parse the game state out of the request body
+    json_dict = bottle.request.json
+    board_state = model.BoardState(json_dict)
+
+    # Delete the stored game state
+    game_id = board_state['game']
+    db.delete(game_id)
+    # TODO: Make sure unauthorized calls aren't trying to delete a game state.
+
+    # The game is over -- taunt them one last time!
     return {
         'taunt': 'Later!'
     }
