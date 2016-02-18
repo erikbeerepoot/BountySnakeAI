@@ -77,7 +77,7 @@ def move():
 
     # TODO: Make sure unauthorized calls aren't trying to predict our next move.
 
-    if (not private_state):
+    if not private_state:
         # Someone has hit this endpoint before hitting /start,
         # or something else is wrong..
         bottle.abort(404, u"Game ID %s not found" % game_id)
