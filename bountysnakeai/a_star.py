@@ -1,3 +1,5 @@
+import heapq
+
 EMPTY = 0
 SNAKE = 1
 FOOD = 2
@@ -28,21 +30,39 @@ class Node(object):
         # manhattan distance as an estimate, for instance)
         self.G = INFINITY
 
-    @property
-    def F(self):
-        return self.G + self.H
-
     def move_cost(self, neighbour):
         # Naively declare that it costs 1 to move from this node to any neighbour
         # TODO: come up with a better heuristic for the move cost
         return 1
 
+    # XXX: Define equality comparisons as being based on the coordinates
+    #      occupied by the Node. This makes it possible to do set membership
+    #      tests without requiring both nodes be the same instance. e.g.
+    #          Node(1, 1) in set([Node(1, 1)]) => True
     def __eq__(self, other):
-        # Define equivalence as occupying the same coordinates
         if isinstance(other, Node):
             return self.x == other.x and self.y == other.y
         else:
             return False
+    # XXX: Define inequality comparisons as being based on the f score
+    #      (where f = g +h) so that we can effeciently sort these nodes in a
+    #      heap / priority queue.
+    # XXX: In order to make our ordering deterministic, we want to sort first
+    #      by f_score, then by x and y coordinates. This will bias our paths
+    #      to prefer those that move toward the origin of the grid, even when
+    #      another direction would be equivalent, but it makes testing easier.
+    def __lt__(self, other):
+        if isinstance(other, Node):
+            return (self.G + self.H, self.x, self.y) \
+                 < (other.G + other.H, other.x, other.y)
+        else:
+            return super(Node, self).__lt__(other)
+    def __gt__(self, other):
+        if isinstance(other, Node):
+            return (self.G + self.H, self.x, self.y) \
+                 > (other.G + other.H, other.x, other.y)
+        else:
+            return super(Node, self).__lt__(other)
 
     def __repr__(self):
         return u'Node(%r, %r)<cont=%r, H=%s, G=%s, parent=%s>' % (
@@ -114,17 +134,16 @@ def find_path(grid, start, goal):
 
     # Add the starting point to the open set
     openset.add(start)
-
-    # HACK: In order to make our ordering deterministic, we want to sort first
-    #       by f_score, then by x and y coordinates. This will bias our paths
-    #       to prefer those that move toward the origin of the grid, even when
-    #       another direction would be equivalent, but it makes testing easier.
-    f_score = lambda node: (node.F, node.x, node.y)
+    openheap = [start]
+    heappush, heappop = heapq.heappush, heapq.heappop
 
     # While there are still nodes that are reachable but haven't been visited...
     while openset:
         # Find the node in the open set with the lowest f_score
-        current = min(openset, key=f_score)
+        # and mark it as visited.
+        current = heappop(openheap)
+        openset.remove(current)
+        closedset.add(current)
 
         # If we've reached the destination node, retrace the path we took
         # and return it.
@@ -137,10 +156,6 @@ def find_path(grid, start, goal):
             path.append(current)
             # Reverse the list so it goes start->goal
             return path[::-1]
-
-        # This node has been visited. Mark it as such.
-        openset.remove(current)
-        closedset.add(current)
 
         # For all neighbour nodes of the current node...
         for node in neighbours(current, grid):
@@ -167,5 +182,6 @@ def find_path(grid, start, goal):
 
                 # Add this to the set of reachable nodes to visit in the future
                 openset.add(node)
+                heappush(openheap, node)
     else:
         raise ValueError('No Path Found')
