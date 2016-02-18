@@ -1,6 +1,9 @@
-import bottle, os, random, redis
+import bottle
+import os
+import random
+import redis
 
-import helper
+from bountysnakeai import helper
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 snakeName = 'Workday'
