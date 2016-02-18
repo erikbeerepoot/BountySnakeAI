@@ -103,3 +103,35 @@ class TestGame(ControllerTestCase):
             u'move': 'north',
             u'taunt': u'We\'re winning',
         })
+
+    def test_end_success(self):
+        app = TestApp(main.application)
+
+        # Start the game
+        json_dict = start_game_json.copy()
+        json_dict[u'snakes'] = [d.copy() for d in start_snakes_json]
+        response = app.post_json('/start', json_dict, status='*')
+        self.assertEqual(response.status, '200 OK')
+
+        # End the game
+        json_dict = start_game_json.copy()
+        json_dict[u'snakes'] = [d.copy() for d in start_snakes_json]
+        response = app.post_json('/end', json_dict, status='*')
+        self.assertEqual(response.status, '200 OK')
+        json_body = json.loads(response.body)
+        self.assertEqual(json_body, {})
+
+        # Verify the game state has been erased
+        private_state = main.db.hgetall(u'test-game')
+        self.assertEqual(private_state, {})
+
+    def test_end_idempotent(self):
+        app = TestApp(main.application)
+
+        # End the game without starting it
+        json_dict = start_game_json.copy()
+        json_dict[u'snakes'] = [d.copy() for d in start_snakes_json]
+        response = app.post_json('/end', json_dict, status='*')
+        self.assertEqual(response.status, '200 OK')
+        json_body = json.loads(response.body)
+        self.assertEqual(json_body, {})
