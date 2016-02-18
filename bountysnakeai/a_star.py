@@ -94,32 +94,30 @@ def neighbours(node, grid):
     b) directly above, below, left, or right of the given node
     c) not occupied by a snake
     """
-    # Check that this isn't a dimensionless grid
+    # Assume that this isn't a dimensionless grid
     width = len(grid)
-    if width == 0: return []
     height = len(grid[0])
-    if height == 0: return []
 
     x = node.x
     y = node.y
-    neighbouring_points = [
-        point
-        for point in [
-            # Left, below, above, right
-            (x-1, y), (x, y-1), (x, y+1), (x+1, y)
-        ]
-        # Filter out points that are out of bounds
-        if 0 <= point[0] < width
-        and 0 <= point[1] < height
+    neighbouring_nodes = []
+
+    # Filter out points that are out of bounds
+    if x >= 1:
+        neighbouring_nodes.append(grid[x-1][y])
+    if y >= 1:
+        neighbouring_nodes.append(grid[x][y-1])
+    if x+1 < width:
+        neighbouring_nodes.append(grid[x+1][y])
+    if y+1 < height:
+        neighbouring_nodes.append(grid[x][y+1])
+
+    # Filter out nodes that are occupied by a snake
+    return [
+        neighbour
+        for neighbour in neighbouring_nodes
+        if neighbour.contents != SNAKE
     ]
-    neighbouring_nodes = [
-        node for node in [
-            grid[x_1][y_1] for x_1, y_1 in neighbouring_points
-        ]
-        # Filter out nodes that are occupied by a snake
-        if node.contents != SNAKE
-    ]
-    return neighbouring_nodes
 
 def manhattan(node_a, node_b):
     return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
