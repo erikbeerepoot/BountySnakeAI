@@ -20,7 +20,7 @@ class TestAStar(TestCase):
         start = Node(0,0)
         goal = Node(1,1)
 
-        path = a_star.find_path(grid, goal, start)
+        path = a_star.find_path(grid, start, goal)
 
         # To get from position (0, 0) to position (W, H) on a grid, there are
         # (W+H choose W) equivalently good paths. Our algorithm is biased,

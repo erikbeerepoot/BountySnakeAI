@@ -101,7 +101,7 @@ def neighbours(node, grid):
 def manhattan(node_a, node_b):
     return abs(node_a.x - node_b.x) + abs(node_a.y - node_b.y)
 
-def find_path(grid, goal, start):
+def find_path(grid, start, goal):
     """
     Find the optimal path from the 'start' node to the 'goal' node within the
     provided grid of nodes.
