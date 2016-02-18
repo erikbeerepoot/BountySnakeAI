@@ -52,16 +52,14 @@ class Node(object):
         )
 
 def build_grid(width, height, snakes):
-    grid = [[0 for x in range(height)] for x in range(width)]
-
-    for x in range(width):
-        for y in range(height):
-            grid[x][y] = Node(x, y)
-
+    grid = [
+        [Node(x, y) for y in range(height)]
+        for x in range(width)
+    ]
     for snake in snakes:
-        for coord in snake.coords:
-            grid[coord[0]][coord[1]] = Node(x, y, contents=SNAKE)
-
+        for p in snake.coords:
+            node = grid[p.x][p.y]
+            node.contents = SNAKE
     return grid
 
 def neighbours(node, grid):
