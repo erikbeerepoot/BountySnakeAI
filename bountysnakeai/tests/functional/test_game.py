@@ -49,6 +49,15 @@ start_snakes_json = [
 ]
 
 class TestGame(ControllerTestCase):
+    def setUp(self):
+        super(TestGame, self).setUp()
+        self.old_snake_id = main.snakeID
+        main.snakeID = 'our-snake-id'
+
+    def tearDown(self):
+        super(TestGame, self).tearDown()
+        main.snakeID = self.old_snake_id
+
     def test_start(self):
         app = TestApp(main.application)
         json_dict = start_game_json.copy()
@@ -66,3 +75,11 @@ class TestGame(ControllerTestCase):
         self.assertEqual(private_state, {
             'phase': 'hide',
         })
+
+    def test_move_failure(self):
+        app = TestApp(main.application)
+        json_dict = start_game_json.copy()
+        json_dict[u'snakes'] = [d.copy() for d in start_snakes_json]
+
+        response = app.post_json('/move', json_dict, status='*')
+        self.assertEqual(response.status, '404 Not Found')
