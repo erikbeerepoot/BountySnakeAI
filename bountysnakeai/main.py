@@ -47,7 +47,7 @@ def start():
     board_state = model.BoardState(json_dict)
 
     # at game start, default to hide phase
-    game_id = board_state['game']
+    game_id = board_state.game
     private_state = {
         'phase': 'hide',
     }
@@ -72,7 +72,7 @@ def move():
     board_state = model.BoardState(json_dict)
 
     # Retrieve the stored game state
-    game_id = board_state['game']
+    game_id = board_state.game
     private_state = db.hgetall(game_id)
 
     # TODO: Make sure unauthorized calls aren't trying to predict our next move.
@@ -117,7 +117,7 @@ def end():
     board_state = model.BoardState(json_dict)
 
     # Delete the stored game state
-    game_id = board_state['game']
+    game_id = board_state.game
     db.delete(game_id)
     # TODO: Make sure unauthorized calls aren't trying to delete a game state.
 
