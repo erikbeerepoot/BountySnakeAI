@@ -1,4 +1,4 @@
-from a_star import *
+from bountysnakeai import a_star
 
 #Prefer lookups over a conditional
 move_lut = [
@@ -31,14 +31,14 @@ def get_next_move_to_food(board_state,snake):
         snake_location = snake.coords[0] 
         food_location = board_state.food_list[0]
 
-        start_node = Node(snake_location[0],snake_location[1])
-        goalNode = Node(food_location[0],food_location[1])
+        start_node = a_star.Node(snake_location[0],snake_location[1])
+        goalNode = a_star.Node(food_location[0],food_location[1])
 
         #Create the grid
-        grid = build_grid(board_state.width, board_state.height, [], board_state.food_list)
+        grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
 
         # Plan our path 
-        path = find_path(grid,start_node,goalNode)
+        path = a_star.find_path(grid,start_node,goalNode)
         log.debug('Current location: %s,%s', start_node.x,start_node.y)
         log.debug('Food location: %s,%s', food_location[0], food_location[1])
         log.debug('Target move: %s,%s', path[1].x,path[1].y)
@@ -61,24 +61,24 @@ def path_to_optimal_corner(board_state,snake):
         head = snake.coords[0]
         startLocation = Node(head.x, head.y)
         corners = [
-            Node(0, 0), # top left
-            Node(0, board_state.width-1), # top right
-            Node(board_state.height-1, board_state.width-1), # bottom left
-            Node(board_state.height-1, 0), # bottom right
+            a_star.Node(0, 0), # top left
+            a_star.Node(0, board_state.width-1), # top right
+            a_star.Node(board_state.height-1, board_state.width-1), # bottom left
+            a_star.Node(board_state.height-1, 0), # bottom right
         ]
 
         #0b. Build grid
-        grid = build_grid(board_state.width, board_state.height, [], [])
+        grid = a_star.build_grid(board_state.width, board_state.height, [], [])
 
         #1. Plan a path to each corner
         paths = [
-            find_path(grid, startLocation, corner)
+            a_star.find_path(grid, startLocation, corner)
             for corner in corners
         ]
 
         #2. Compare the cost
         path_costs = [
-            path[-1].G if path else INFINITY
+            path[-1].G if path else a_star.INFINITY
             for path in paths
         ]
         triples = zip(corners, paths, path_costs)
@@ -99,14 +99,14 @@ def path_to_centre(board_state,snake):
         '''
 
         #We're planning a path between our current location and the centre
-        start_location = Node(snake.coords[0][0],snake.coords[0][1])
-        centre = Node(round(board_state.width),round(board_state.height))
+        start_location = a_star.Node(snake.coords[0][0],snake.coords[0][1])
+        centre = a_star.Node(round(board_state.width),round(board_state.height))
 
         #Create the grid to plan on 
-        grid = build_grid(board_state.width,board_state.height, [], [])
+        grid = a_star.build_grid(board_state.width,board_state.height, [], [])
 
         #Actually plan the path
-        path_to_centre = find_path(grid,start_location, centre)
+        path_to_centre = a_star.find_path(grid,start_location, centre)
 
 def get_next_move_to_centre(board_state,snake):
         '''
