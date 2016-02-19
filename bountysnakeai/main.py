@@ -122,6 +122,7 @@ def move():
 
     print("Move: " + move )
 
+    path_to_corner = helper.pick_corner(board_state, our_snake)
     return {
         u'move': move,
         u'taunt': random.choice(taunts)
@@ -138,7 +139,6 @@ def end():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
-    log.debug(json_dict)
     board_state = model.BoardState(json_dict)
 
     # Delete the stored game state
