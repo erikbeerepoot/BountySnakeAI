@@ -49,7 +49,7 @@ def start():
     except KeyError, e :
         print("KeyError: We didn't get the dictionary we were excepting")
         return {
-           u'error' : u'You gave us invalid data!' + e.message 
+            u'error' : u'You gave us invalid data! Missing key in json dict: ' + e.message 
         }
 
 
