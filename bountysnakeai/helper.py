@@ -16,7 +16,7 @@ def health_threshold(board_state):
     # XXX: This is a very naive heuristic.
     return (board_state.width * board_state.height) // 4
 
-def get_food(board_state,snake):
+def get_next_move_to_food(board_state,snake):
         '''
         Return the next best move to the food
         '''
@@ -42,7 +42,14 @@ def get_food(board_state,snake):
         #Turn path into a move we can pass back
         return compute_relative_move(path[1],snakeLocation) 
 
-def pick_corner(board_state,snake):
+def get_next_move_to_corner(board_state,snake):
+        '''
+        Gets the next move to the corner, output in a useful format ('north','east', etc)
+        '''
+        path = path_to_optimal_corner(board_state,snake)
+        return compute_relative_mode(path[1], snakeLocation)
+
+def path_to_optimal_corner(board_state,snake):
         '''
         Compares the paths to each of the corners, and picks the "best" one
         '''
@@ -78,12 +85,11 @@ def pick_corner(board_state,snake):
         #Debug
         picked_corner = corners[indexOfLowestCostPath]
         print("Picked corner: " + str(picked_corner.x) + "," + str(picked_corner.y))
-        return costs[indexOfLowestCostPath]
+        return paths[indexOfLowestCostPath]
 
 def compute_relative_move(move,snakeLocation):
         #Compute the difference (offset by one)
         delta_x = (move.x - snakeLocation[0]) + 1
         delta_y = (move.y - snakeLocation[1]) + 1
-        print("del x: " + str(delta_x) + ", y: " + str(delta_y))
         return moveLUT[delta_x][delta_y]
 
