@@ -66,8 +66,6 @@ def start():
             u'error' : u'You gave us invalid data! Missing key in json dict: ' + e.message 
         }
 
-
-
     # at game start, default to hide phase
     game_id = board_state.game
     private_state = {
@@ -92,7 +90,6 @@ def move():
     # Parse the game state out of the request body
     json_dict = bottle.request.json
     log.debug(json_dict)
- 
 
     board_state = model.BoardState(json_dict)
 
@@ -123,14 +120,13 @@ def move():
 
     BUT: until we have that ...
     """
- 
+
     if our_snake.health < helper.health_threshold(board_state):
         #Compute our move relative to the current position 
         move = helper.get_next_move_to_food(board_state, our_snake)
     else:
         move = helper.get_next_move_to_corner(board_state, our_snake)
 
-        
     print("Move: " + move )
 
     return {
