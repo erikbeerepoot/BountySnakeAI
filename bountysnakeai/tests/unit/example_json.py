@@ -7,9 +7,7 @@ dummy_snake_1 = """{
     "age": 56,
     "health": 83,
     "coords": [ [1, 1], [1, 2], [2, 2] ],
-    "kills": 4,
-    "food": 12,
-    "gold": 2
+    "kills": 4
 }"""
 dummy_snake_2 = """{
     "id": "9876-543210-123456-7890",
@@ -20,18 +18,14 @@ dummy_snake_2 = """{
     "age": 56,
     "health": 70,
     "coords": [ [4, 4], [4, 3], [4, 2], [4, 1] ],
-    "kills": 4,
-    "food": 20,
-    "gold": 2
+    "kills": 4
 }"""
 dummy_game = """{
     "game": "hairy-cheese",
     "mode": "advanced",
     "turn": 4,
-    "board": {
-        "height": 20,
-        "width": 30
-    },
+    "height": 20,
+    "width": 30,
     "snakes": [
         %s, %s
     ],

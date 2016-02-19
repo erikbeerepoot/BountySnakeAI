@@ -24,8 +24,6 @@ class TestParsing(TestCase):
             model.Point(2, 2),
         ])
         self.assertEqual(s.kills, 4)
-        self.assertEqual(s.food, 12)
-        self.assertEqual(s.gold, 2)
 
     def test_boardstate(self):
         json_dict = json.loads(example_json.dummy_game)

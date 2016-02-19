@@ -6,10 +6,8 @@ class BoardState(object):
         "game": "hairy-cheese",
         "mode": "advanced",
         "turn": 0,
-        "board": {
-            "height": 20,
-            "width": 30
-        },
+        "height": 20,
+        "width": 30,
         "snakes": [
             <Snake Object>, ...
         ],
@@ -37,8 +35,6 @@ class Snake(object):
         "health": 83,
         "coords": [ [1, 1], [1, 2], [2, 2] ],
         "kills": 4,
-        "food": 12,
-        "gold": 2
     }
     """
     def __init__(self, json_dict):
