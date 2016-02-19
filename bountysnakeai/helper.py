@@ -47,7 +47,7 @@ def pick_corner(board_state,snake):
         Compares the paths to each of the corners, and picks the "best" one
         '''
         #0. Set up  target locations 
-        startLocation = Node(snake.coords[0][0],snake.coords[0][1]))
+        startLocation = Node(snake.coords[0][0],snake.coords[0][1])
         top_left = Node(0,0)
         top_right = Node(0,board_state.width)
         bottom_right = Node(board_state.height,board_state.width)
