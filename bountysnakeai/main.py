@@ -1,10 +1,22 @@
 import bottle
+import logging
 import os
 import random
 import redis
+import sys
 
 from bountysnakeai import helper
 from bountysnakeai import model
+
+log = logging.getLogger(__name__)
+log_level = logging.DEBUG
+log.setLevel(log_level)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(log_level)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+stdout_handler.setFormatter(formatter)
+log.addHandler(stdout_handler)
+
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = [u"We're winning"]
@@ -52,8 +64,6 @@ def start():
             u'error' : u'You gave us invalid data! Missing key in json dict: ' + e.message 
         }
 
-
-
     # at game start, default to hide phase
     game_id = board_state.game
     private_state = {
@@ -77,8 +87,6 @@ def move():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
- 
-
     board_state = model.BoardState(json_dict)
 
     # Retrieve the stored game state
@@ -130,6 +138,7 @@ def end():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
+    log.debug(json_dict)
     board_state = model.BoardState(json_dict)
 
     # Delete the stored game state
