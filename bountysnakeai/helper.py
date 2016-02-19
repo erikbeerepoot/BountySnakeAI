@@ -49,9 +49,9 @@ def pick_corner(board_state,snake):
         #0. Set up  target locations 
         startLocation = Node(snake.coords[0][0],snake.coords[0][1])
         top_left = Node(0,0)
-        top_right = Node(0,board_state.width)
-        bottom_right = Node(board_state.height,board_state.width)
-        bottom_left =  Node(board_state.height,0)
+        top_right = Node(0,board_state.width-1) 
+        bottom_right = Node(board_state.height-1,board_state.width-1)
+        bottom_left =  Node(board_state.height-1,0)
         corners = [top_left,top_right,bottom_right,bottom_left]
 
         #0b. Build grid
