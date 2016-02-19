@@ -53,38 +53,41 @@ def path_to_optimal_corner(board_state,snake):
         '''
         Compares the paths to each of the corners, and picks the "best" one
         '''
-        #0. Set up  target locations 
-        startLocation = Node(snake.coords[0][0],snake.coords[0][1])
-        top_left = Node(0,0)
-        top_right = Node(0,board_state.width-1) 
-        bottom_right = Node(board_state.height-1,board_state.width-1)
-        bottom_left =  Node(board_state.height-1,0)
-        corners = [top_left,top_right,bottom_right,bottom_left]
+        #0. Set up  target locations
+        head = snake.coords[0]
+        startLocation = Node(head.x, head.y)
+        corners = [
+            Node(0, 0), # top left
+            Node(0, board_state.width-1), # top right
+            Node(board_state.height-1, board_state.width-1), # bottom left
+            Node(board_state.height-1, 0), # bottom right
+        ]
 
         #0b. Build grid
-        grid = build_grid(board_state.width,board_state.height, [], [])
+        grid = build_grid(board_state.width, board_state.height, [], [])
 
         #1. Plan a path to each corner
-        path_to_tl = find_path(grid,startLocation,top_left)         
-        path_to_tr = find_path(grid,startLocation,top_right)         
-        path_to_br = find_path(grid,startLocation,bottom_right)         
-        path_to_bl = find_path(grid,startLocation,bottom_left)         
-        paths = [path_to_tl,path_to_tr,path_to_br,path_to_bl]
+        paths = [
+            find_path(grid, startLocation, corner)
+            for corner in corners
+        ]
 
-        #2. Compare the cost 
-        costs = []
-        costs.append(path_to_tl[-1].G if len(path_to_tl) > 0 else [] )
-        costs.append(path_to_tr[-1].G if len(path_to_tr) > 0 else [] )
-        costs.append(path_to_br[-1].G if len(path_to_br) > 0 else [] )
-        costs.append(path_to_bl[-1].G if len(path_to_bl) > 0 else [] )
-        if len(costs) > 0:
-                index_of_lowest_cost_path = costs.index(min(costs))
-        else: 
-                return []
-        
-        picked_corner = corners[index_of_lowest_cost_path]
-        log.debug('Picked corner: %s,%s', picked_corner.x,picked_corner.y)
-        return paths[index_of_lowest_cost_path]
+        #2. Compare the cost
+        path_costs = [
+            path[-1].G if path else INFINITY
+            for path in paths
+        ]
+        triples = zip(corners, paths, path_costs)
+        triples.sort(key=lambda t: t[2]) # sort by cost
+        optimal_corner, optimal_path, optimal_cost = triples[0]
+
+        if optimal_cost == INFINITY:
+            # We couldn't find a good path :(
+            log.debug('Could find no optimal corner')
+            return []
+        else:
+            log.debug('Picked corner: %s,%s', optimal_corner.x, optimal_corner.y)
+            return optimal_path
 
 def path_to_centre(board_state,snake):
         '''
