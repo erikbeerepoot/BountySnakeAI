@@ -24,10 +24,10 @@ def get_next_move_to_food(board_state,snake):
            return u"none"
 
 
-        snakeLocation = snake.coords[0] 
+        snake_location = snake.coords[0] 
         foodLocation = board_state.food_list[0]
 
-        startNode = Node(snakeLocation[0],snakeLocation[1])
+        startNode = Node(snake_location[0],snake_location[1])
         goalNode = Node(foodLocation[0],foodLocation[1])
 
         #Create the grid
@@ -40,14 +40,14 @@ def get_next_move_to_food(board_state,snake):
         print("Target move: " + str(path[1].x) + "," + str(path[1].y))
         
         #Turn path into a move we can pass back
-        return compute_relative_move(path[1],snakeLocation) 
+        return compute_relative_move(path[1],snake_location) 
 
 def get_next_move_to_corner(board_state,snake):
         '''
         Gets the next move to the corner, output in a useful format ('north','east', etc)
         '''
         path = path_to_optimal_corner(board_state,snake)
-        return compute_relative_move(path[1], snakeLocation)
+        return compute_relative_move(path[1], snake_location)
 
 def path_to_optimal_corner(board_state,snake):
         '''
@@ -87,9 +87,33 @@ def path_to_optimal_corner(board_state,snake):
         print("Picked corner: " + str(picked_corner.x) + "," + str(picked_corner.y))
         return paths[indexOfLowestCostPath]
 
-def compute_relative_move(move,snakeLocation):
+def path_to_centre(board_state,snake):
+        '''
+        Plans a path to the centre of the board
+        '''
+
+        #We're planning a path between our current location and the centre
+        start_location = Node(snake.coords[0][0],snake.coords[0][1])
+        centre = Node(round(board_state.width),round(board_state.height))
+
+        #Create the grid to plan on 
+        grid = build_grid(board_state.width,board_state.height, [], [])
+
+        #Actually plan the path
+        path_to_centre = find_path(grid,start_location, centre)
+
+def get_next_move_to_centre(board_state,snake):
+        '''
+        Returns the next move to be taken to the centre of the board
+        in a form that the game understands
+        '''
+        snake_location = snake.coords[0]
+        path_to_centre = path_to_centre(board_state,snake)
+        return compute_relative_move(path_to_centre[1],snake_location)
+
+def compute_relative_move(move,snake_location):
         #Compute the difference (offset by one)
-        delta_x = (move.x - snakeLocation[0]) + 1
-        delta_y = (move.y - snakeLocation[1]) + 1
+        delta_x = (move.x - snake_location[0]) + 1
+        delta_y = (move.y - snake_location[1]) + 1
         return moveLUT[delta_x][delta_y]
 
