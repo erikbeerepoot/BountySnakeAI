@@ -113,7 +113,7 @@ def move():
         #Compute our move relative to the current position 
         move = helper.get_next_move_to_food(board_state, our_snake)
     else:
-        path_to_corner = helper.get_next_move_to_corner(board_state, our_snake)
+        move = helper.get_next_move_to_corner(board_state, our_snake)
 
         
     print("Move: " + move )
