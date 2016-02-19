@@ -65,7 +65,7 @@ def pick_corner(board_state,snake):
         paths = [path_to_tl,path_to_tr,path_to_br,path_to_bl]
 
         #2. Compare the cost 
-        cost = [path_to_tl(-1).G,path_to_tl(-1).G,path_to_br(-1).G, path_to_bl(-1).G]
+        cost = [path_to_tli[-1].G,path_to_tl[-1].G,path_to_br[-1].G, path_to_bl[-1].G]
         indexOfLowestCostPath = cost.index(min(cost))
         
         #Debug
