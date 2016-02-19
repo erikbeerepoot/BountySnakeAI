@@ -1,7 +1,7 @@
 from a_star import *
 
 #Prefer lookups over a conditional
-moveLUT =[[u'invalid (0,0)',u'west',u'invalid (0,2)'],[u'south',u'invalid (1,1)', u'north'],[u'invalid (2,0)',u'east',u'invalid (2,2)']]
+moveLUT =[[u'invalid (0,0)',u'west',u'invalid (0,2)'],[u'north',u'invalid (1,1)', u'south'],[u'invalid (2,0)',u'east',u'invalid (2,2)']]
 
 def getSnake(board_state, snake_id):
     for snake in board_state.snake_list:
