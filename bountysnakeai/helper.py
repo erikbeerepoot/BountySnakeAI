@@ -47,7 +47,7 @@ def get_next_move_to_corner(board_state,snake):
         Gets the next move to the corner, output in a useful format ('north','east', etc)
         '''
         path = path_to_optimal_corner(board_state,snake)
-        return compute_relative_mode(path[1], snakeLocation)
+        return compute_relative_move(path[1], snakeLocation)
 
 def path_to_optimal_corner(board_state,snake):
         '''
