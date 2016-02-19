@@ -71,7 +71,7 @@ def pick_corner(board_state,snake):
         costs.append(path_to_br[-1] if len(path_to_br) > 0 else [] )
         costs.append(path_to_bl[-1] if len(path_to_bl) > 0 else [] )
         if len(costs) > 0:
-                indexOfLowestCostPath = cost.index(min(cost))
+                indexOfLowestCostPath = costs.index(min(costs))
         else: 
                 return []
         
