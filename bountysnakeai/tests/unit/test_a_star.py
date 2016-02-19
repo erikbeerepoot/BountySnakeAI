@@ -57,9 +57,10 @@ class TestAStar(TestCase):
         start = Node(0, 0)
         goal = Node(2, 2)
 
-        with self.assertRaises(ValueError) as context:
-            # We're stuck in a corner! This should throw an exception...
-            path = a_star.find_path(grid, start, goal)
+        # We're stuck in a corner! This should throw an exception...
+        path = a_star.find_path(grid, start, goal)
+
+        self.assertEqual(path, [])
 
     def test_4x4_obstructed_path(self):
         Node = a_star.Node

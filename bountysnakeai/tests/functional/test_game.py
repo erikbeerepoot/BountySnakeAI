@@ -8,10 +8,8 @@ start_game_json = {
     u'game': u'test-game',
     u'mode': u'classic',
     u'turn': 0,
-    u'board': {
-        u'height': 20,
-        u'width': 20,
-    },
+    u'height': 20,
+    u'width': 20,
     u'snakes': [],
     u'food': [],
     # Advanced mode only:
@@ -30,8 +28,6 @@ start_snakes_json = [
         'health': 83,
         'coords': [ [1, 1], [1, 2], [2, 2] ],
         'kills': 4,
-        'food': 12,
-        'gold': 2
     },
     {
         'id': 'their-snake-id',
@@ -43,8 +39,6 @@ start_snakes_json = [
         'health': 83,
         'coords': [ [4, 2], [4, 3], [4, 4] ],
         'kills': 5,
-        'food': 10,
-        'gold': 2
     }
 ]
 
