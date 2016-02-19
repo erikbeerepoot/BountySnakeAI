@@ -46,10 +46,10 @@ def start():
     json_dict = bottle.request.json
     try:
         board_state = model.BoardState(json_dict)
-    except KeyError :
+    except KeyError, e :
         print("KeyError: We didn't get the dictionary we were excepting")
         return {
-           u'error' : u'You gave us invalid data!'
+           u'error' : u'You gave us invalid data!' + e.message 
         }
 
 
