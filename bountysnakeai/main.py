@@ -48,6 +48,10 @@ def start():
         board_state = model.BoardState(json_dict)
     except KeyError :
         print("KeyError: We didn't get the dictionary we were excepting")
+        return {
+           u'error' : u'You gave us invalid data!'
+        }
+
 
 
     # at game start, default to hide phase
