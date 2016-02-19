@@ -78,7 +78,7 @@ def pick_corner(board_state,snake):
         #Debug
         picked_corner = corners[indexOfLowestCostPath]
         print("Picked corner: " + str(picked_corner.x) + "," + str(picked_corner.y))
-        return cost[indexOfLowestCostPath]
+        return costs[indexOfLowestCostPath]
 
 def compute_relative_move(move,snakeLocation):
         #Compute the difference (offset by one)
