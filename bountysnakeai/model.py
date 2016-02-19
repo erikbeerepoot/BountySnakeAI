@@ -20,8 +20,8 @@ class BoardState(object):
         self.game = json_dict['game']
         self.mode = json_dict['mode']
         self.turn = json_dict['turn']
-        self.width = json_dict['board']['width']
-        self.height = json_dict['board']['height']
+        self.width = json_dict['width']
+        self.height = json_dict['height']
         self.snake_list = [Snake(snake_dict) for snake_dict in json_dict['snakes']]
         self.food_list = [Point(*f) for f in json_dict['food']]
 
@@ -51,8 +51,8 @@ class Snake(object):
         self.health = json_dict['health']
         self.coords = [Point(*c) for c in json_dict['coords']]
         self.kills = json_dict['kills']
-        self.food = json_dict['food']
-        self.gold = json_dict['gold']
+        #self.food = json_dict['food']
+        #self.gold = json_dict['gold']
 
 Point = namedtuple('Point', ['x', 'y'])
 
