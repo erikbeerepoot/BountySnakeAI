@@ -109,7 +109,7 @@ def move():
     BUT: until we have that ...
     """
  
-    if our_snake.health < helper.health_threshold(board_state,our_snake):
+    if our_snake.health < helper.health_threshold(board_state):
         #Compute our move relative to the current position 
         move = helper.get_next_move_to_food(board_state, our_snake)
     else:
