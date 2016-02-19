@@ -1,7 +1,7 @@
 from a_star import *
 
 #Prefer lookups over a conditional
-moveLUT =[[u'invalid (0,0)',u'west',u'invalid (0,2)'],[u'north',u'invalid (1,1)', u'south'],[u'invalid (2,0)',u'east',u'invalid (2,2)']]
+move_lut =[[u'invalid (0,0)',u'west',u'invalid (0,2)'],[u'north',u'invalid (1,1)', u'south'],[u'invalid (2,0)',u'east',u'invalid (2,2)']]
 
 def getSnake(board_state, snake_id):
     for snake in board_state.snake_list:
@@ -25,19 +25,19 @@ def get_next_move_to_food(board_state,snake):
 
 
         snake_location = snake.coords[0] 
-        foodLocation = board_state.food_list[0]
+        food_location = board_state.food_list[0]
 
-        startNode = Node(snake_location[0],snake_location[1])
-        goalNode = Node(foodLocation[0],foodLocation[1])
+        start_node = Node(snake_location[0],snake_location[1])
+        goalNode = Node(food_location[0],food_location[1])
 
         #Create the grid
         grid = build_grid(board_state.width, board_state.height, [], board_state.food_list)
 
         # Plan our path 
-        path = find_path(grid,startNode,goalNode)
-        print("Current location: " + str(startNode.x) + "," +  str(startNode.y))
-        print("Food location: " + str(foodLocation[0]) + "," + str(foodLocation[1]))
-        print("Target move: " + str(path[1].x) + "," + str(path[1].y))
+        path = find_path(grid,start_node,goalNode)
+        log.debug('Current location: %s,%s', start_node.x,start_node.y)
+        log.debug('Food location: %s,%s', food_location[0], food_location[1])
+        log.debug('Target move: %s,%s', path[1].x,path[1].y)
         
         #Turn path into a move we can pass back
         return compute_relative_move(path[1],snake_location) 
@@ -78,14 +78,13 @@ def path_to_optimal_corner(board_state,snake):
         costs.append(path_to_br[-1].G if len(path_to_br) > 0 else [] )
         costs.append(path_to_bl[-1].G if len(path_to_bl) > 0 else [] )
         if len(costs) > 0:
-                indexOfLowestCostPath = costs.index(min(costs))
+                index_of_lowest_cost_path = costs.index(min(costs))
         else: 
                 return []
         
-        #Debug
-        picked_corner = corners[indexOfLowestCostPath]
-        print("Picked corner: " + str(picked_corner.x) + "," + str(picked_corner.y))
-        return paths[indexOfLowestCostPath]
+        picked_corner = corners[index_of_lowest_cost_path]
+        log.debug('Picked corner: %s,%s', picked_corner.x,picked_corner.y)
+        return paths[index_of_lowest_cost_path]
 
 def path_to_centre(board_state,snake):
         '''
@@ -115,5 +114,5 @@ def compute_relative_move(move,snake_location):
         #Compute the difference (offset by one)
         delta_x = (move.x - snake_location[0]) + 1
         delta_y = (move.y - snake_location[1]) + 1
-        return moveLUT[delta_x][delta_y]
+        return move_lut[delta_x][delta_y]
 
