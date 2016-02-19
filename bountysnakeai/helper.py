@@ -76,7 +76,7 @@ def pick_corner(board_state,snake):
                 return []
         
         #Debug
-        picked_corner = corners(indexOfLowestCostPath)
+        picked_corner = corners[indexOfLowestCostPath]
         print("Picked corner: " + picked_corner.x + "," + picked_corner.y)
         return cost[indexOfLowestCostPath]
 
