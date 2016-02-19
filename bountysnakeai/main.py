@@ -61,6 +61,7 @@ def start():
     game_id = board_state.game
     private_state = {
         'phase': 'hide',
+        'move': None,
     }
     db.hmset(game_id, private_state)
     # TODO: Make sure unauthorized calls aren't overwriting an existing game state.
@@ -99,24 +100,19 @@ def move():
     if not our_snake:
         bottle.abort(400, u"Bad Request: my snake is missing!")
 
-    """
-    TODO: implement something like this...
-
-    if our_snake.health < helper.health_threshold(board_state):
-        move = helper.getFood(board_state, our_snake)
-    elif private_state['phase'] == 'circle':
-        move = helper.circle(board_state, our_snake)
-    else:
-        move = helper.hide(board_state, our_snake)
-
-    BUT: until we have that ...
-    """
-
     if our_snake.health < helper.health_threshold(board_state, our_snake):
         #Compute our move relative to the current position 
+        private_state['phase'] = 'food'
         move = helper.get_next_move_to_food(board_state, our_snake)
+    elif (private_state['phase'] == 'circle') or helper.snake_at_corner(board_state, our_snake):
+        private_state['phase'] = 'circle'
+        move = helper.circle(board_state, our_snake, private_state['move'])
     else:
+        private_state['phase'] = 'hiding'
         move = helper.get_next_move_to_corner(board_state, our_snake)
+
+    private_state['move'] = move
+    db.hmset(game_id, private_state)
 
     print("Move: " + move )
 

@@ -14,6 +14,14 @@ def getSnake(board_state, snake_id):
             return snake
     return None
 
+def get_corners(board_state):
+    return [
+        a_star.Node(0, 0), # top left
+        a_star.Node(0, board_state.width-1), # top right
+        a_star.Node(board_state.height-1, board_state.width-1), # bottom left
+        a_star.Node(board_state.height-1, 0), # bottom right
+    ]
+
 def health_threshold(board_state, snake):
     """
     Return the 'threshold' of health below which our snake should go find food.
@@ -81,13 +89,8 @@ def path_to_optimal_corner(board_state, snake):
         '''
         # 0. Set up  target locations
         head = snake.coords[0]
-        start_location = a_star.Node(head.x, head.y)
-        corners = [
-            a_star.Node(0, 0), # top left
-            a_star.Node(0, board_state.width-1), # top right
-            a_star.Node(board_state.height-1, board_state.width-1), # bottom left
-            a_star.Node(board_state.height-1, 0), # bottom right
-        ]
+        start_location = Node(head.x, head.y)
+        corners = get_corners(board_state)
 
         # 0b. Build grid
         grid = a_star.build_grid(board_state.width, board_state.height, [], [])
@@ -145,3 +148,72 @@ def compute_relative_move(move, snake_location):
         delta_y = (move.y - snake_location[1]) + 1
         return move_lut[delta_x][delta_y]
 
+def snake_at_corner(board_state, our_snake) :
+    head = our_snake.coords[0]
+    position = a_star.Node(head[0], head[1])
+
+    corners = get_corners(board_state)
+
+    for corner in corners:
+        distance = a_star.manhattan(position, corner)
+        if corner_threshold(distance, our_snake) :
+            return True
+    return False
+
+def corner_threshold(cost, snake):
+    #TODO: make this a function of snake length
+    return cost < 5
+
+def circle(board_state, our_snake, move):
+
+    quarter = len(our_snake.coords)//4
+
+    grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
+
+    #Check if quarters worth of snake is going in the same direction. If not, continue if allowed
+    if (move == 'north' or move == 'south'):
+        for coord in our_snake.coords[:quarter]:
+            if (our_snake.coords[0][0] != coord[0] and move_allowed(move, grid, our_snake.coords[0])):
+                #continue in same direction if allowed
+                return move
+    else:
+        for coord in our_snake.coords[:quarter]:
+            if (our_snake.coords[0][1] != coord[1] and move_allowed(move, grid, our_snake.coords[0])):
+                #continue in same direction if allowed
+                return move
+
+    #3rd. We need to turn. Choose direction that doesn't suck
+    return choose_move(move, our_snake.coords[0][0], grid)
+
+def move_allowed(direction, grid, head):
+    try :
+        if (direction == 'north'):
+            return grid[head[0], head[1] - 1].contents != 1 #snake
+        elif (direction == 'south'):
+            return grid[head[0], head[1] + 1].contents != 1 #snake
+        elif (direction == 'west'):
+            return grid[head[0] - 1, head[1]].contents != 1 #snake
+        else:
+            return grid[head[0] + 1, head[1]].contents != 1 #snake
+    except:
+        # out of bounds, move would hit a wall
+        return False
+
+def choose_move(move, head, grid):
+    #TODO: recover from one of these bad scenarios. Need to make our approach lend itself to a large enough clockwise circle
+    if (move == 'north'):
+        if (move_allowed('east', grid, head)):
+            return 'east'
+        return 'west' #can't circle. Hail mary to the only place we can go
+    elif (move == 'east'):
+        if (move_allowed('south', grid, head)):
+            return 'south'
+        return 'north' #can't circle. Hail mary to the only place we can go
+    elif (move == 'south'):
+        if (move_allowed('west', grid, head)):
+            return 'west'
+        return 'east' #can't circle. Hail mary to the only place we can go
+    else:
+        if (move_allowed('north', grid, head)) :
+            return 'north'
+        return 'south' #can't circle. Hail mary to the only place we can go
