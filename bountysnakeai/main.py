@@ -1,10 +1,22 @@
 import bottle
+import logging
 import os
 import random
 import redis
+import sys
 
 from bountysnakeai import helper
 from bountysnakeai import model
+
+log = logging.getLogger(__name__)
+log_level = logging.DEBUG
+log.setLevel(log_level)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(log_level)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+stdout_handler.setFormatter(formatter)
+log.addHandler(stdout_handler)
+
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = [u"We're winning"]
@@ -44,6 +56,8 @@ def start():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
+    log.debug(json_dict)
+
     try:
         board_state = model.BoardState(json_dict)
     except KeyError, e :
@@ -51,8 +65,6 @@ def start():
         return {
             u'error' : u'You gave us invalid data! Missing key in json dict: ' + e.message 
         }
-
-
 
     # at game start, default to hide phase
     game_id = board_state.game
@@ -77,7 +89,7 @@ def move():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
- 
+    log.debug(json_dict)
 
     board_state = model.BoardState(json_dict)
 
@@ -108,14 +120,13 @@ def move():
 
     BUT: until we have that ...
     """
- 
+
     if our_snake.health < helper.health_threshold(board_state):
         #Compute our move relative to the current position 
         move = helper.get_next_move_to_food(board_state, our_snake)
     else:
         move = helper.get_next_move_to_corner(board_state, our_snake)
 
-        
     print("Move: " + move )
 
     return {
@@ -134,6 +145,7 @@ def end():
     """
     # Parse the game state out of the request body
     json_dict = bottle.request.json
+    log.debug(json_dict)
     board_state = model.BoardState(json_dict)
 
     # Delete the stored game state
