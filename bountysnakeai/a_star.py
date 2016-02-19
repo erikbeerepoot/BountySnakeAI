@@ -192,4 +192,6 @@ def find_path(grid, start, goal):
                 openset.add(node)
                 heappush(openheap, node)
     else:
-        raise ValueError('No Path Found')
+        #Return an empty path
+        print("No path found, returning empty path list")
+        return []
