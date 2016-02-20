@@ -217,14 +217,18 @@ def circle(board_state, our_snake, previous_move):
         'None': 'west', # if there is no previous move, try to head west
     }
 
+    log.debug('Previous move: %s', previous_move)
+    log.debug('front_points=%s', front_points)
     if (previous_move in ['north', 'south'] and not all(point.x == head_point.x for point in front_points)) \
     or (previous_move in ['east', 'west']   and not all(point.y == head_point.y for point in front_points)):
         # If the front quarter of the snake isn't all going in the same
         # direction then continue, if possible, in the previous direction
         preferred_direction = previous_move
+        log.debug('Haven\'t moved 1/4 length yet. Stay the course %s.', preferred_direction)
     else:
         # Otherwise, we'd like to turn clockwise.
         preferred_direction = next_clockwise[previous_move]
+        log.debug('Moved 1/4 length, trying to turn %s!', preferred_direction)
 
     path = []
     start_node = a_star.Node.from_point(head_point)
@@ -239,6 +243,7 @@ def circle(board_state, our_snake, previous_move):
         else:
             # If we didn't find a path forward, try turning clockwise again...
             preferred_direction = next_clockwise[preferred_direction]
+            log.debug('Nowhere to go, trying to turn %s!', preferred_direction)
 
     else:
         raise AssertionError('Failed to find a point to move to after turning clockwise four times!')
