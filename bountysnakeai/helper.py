@@ -200,8 +200,8 @@ def get_next_move_to_centre(board_state, snake):
         in a form that the game understands
         '''
         snake_location = snake.coords[0]
-        path_to_centre = path_to_centre(board_state, snake)
-        target = path_to_centre[1].point
+        path = path_to_centre(board_state, snake)
+        target = path[1].point
         return compute_relative_move(snake_location, target)
 
 def compute_relative_move(snake_location, target):
