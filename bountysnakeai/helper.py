@@ -139,17 +139,17 @@ def get_next_move_to_centre(board_state, snake):
         target = path_to_centre[1].point
         return compute_relative_move(target, snake_location)
 
-def compute_relative_move(move, snake_location):
+def compute_relative_move(target, snake_location):
     """
     For two contiguous squares, is the destination north, south, east, or west
     of the snake location?
 
     Remember that moving towards the x-axis is 'up'!
     """
-    delta_x = move.x - snake_location.x
-    delta_y = move.y - snake_location.y
+    delta_x = target.x - snake_location.x
+    delta_y = target.y - snake_location.y
 
-    log.debug("Moving from %s to %s?", move, snake_location)
+    log.debug("Moving from %s to %s?", snake_location, target)
 
     # Ensure we're moving exactly one square north, south, east, or west
     assert abs(delta_x) + abs(delta_y) == 1
@@ -163,7 +163,7 @@ def compute_relative_move(move, snake_location):
     elif delta_y == -1:
         direction = 'north'
 
-    log.debug("Moving %s from %s to %s", direction, snake_location, move)
+    log.debug("Moving %s from %s to %s", direction, snake_location, target)
     return direction
 
 def snake_at_corner(board_state, our_snake) :
