@@ -181,6 +181,31 @@ def path_to_optimal_corner(board_state, snake):
             log.debug('Picked corner: %s,%s', optimal_corner.x, optimal_corner.y)
             return optimal_path
 
+def path_to_centre(board_state, snake):
+        '''
+        Plans a path to the centre of the board
+        '''
+
+        # We're planning a path between our current location and the centre
+        start_location = a_star.Node.from_point(snake.coords[0])
+        centre = a_star.Node(board_state.width//2, board_state.height//2)
+
+        # Create the grid to plan on
+        grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list)
+
+        # Actually plan the path
+        path_to_centre = a_star.find_path(grid, start_location, centre)
+
+def get_next_move_to_centre(board_state, snake):
+        '''
+        Returns the next move to be taken to the centre of the board
+        in a form that the game understands
+        '''
+        snake_location = snake.coords[0]
+        path_to_centre = path_to_centre(board_state, snake)
+        target = path_to_centre[1].point
+        return compute_relative_move(snake_location, target)
+
 def compute_relative_move(snake_location, target):
     """
     For two contiguous squares, is the destination north, south, east, or west
