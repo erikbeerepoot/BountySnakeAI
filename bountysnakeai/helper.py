@@ -107,6 +107,7 @@ def path_to_optimal_corner(board_state, snake):
 
         if optimal_cost == a_star.INFINITY:
             # We couldn't find a good path :(
+            # FIXME: maybe it's just that no corner was empty???
             log.debug('Could find no optimal corner')
             return []
         else:
