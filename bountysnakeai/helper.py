@@ -41,11 +41,12 @@ def get_next_move_to_food(board_state, snake):
         '''
         path, cost = plan_path_to_food(board_state, snake)
         if path:
-                log.debug('Target move: %s,%s', path[1].x, path[1].y)
+            target = path[0].point
+            log.debug('Target move: %s', target)
 
-                # Turn path into a move we can pass back
-                snake_location = snake.coords[0]
-                return compute_relative_move(path[1], snake_location)
+            # Turn path into a move we can pass back
+            snake_location = snake.coords[0]
+            return compute_relative_move(target, snake_location)
         else:
             return u"none"
 
@@ -56,10 +57,10 @@ def plan_path_to_food(board_state, snake):
         # Create the grid for a*
         grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
 
-        start_node = a_star.Node(snake.coords[0].x, snake.coords[0].y)
+        start_node = a_star.Node.from_point(snake.coords[0])
 
         # Plan a path to each of the food locations
-        goals = [a_star.Node(goal.x, goal.y) for goal in board_state.food_list]
+        goals = [a_star.Node.from_point(goal) for goal in board_state.food_list]
         paths_to_food = [
                 a_star.find_path(grid, start_node, goal)
                 for goal in goals
@@ -81,7 +82,8 @@ def get_next_move_to_corner(board_state, snake):
         '''
         snake_location = snake.coords[0]
         path = path_to_optimal_corner(board_state, snake)
-        return compute_relative_move(path[1], snake_location)
+        target = path[1].point
+        return compute_relative_move(target, snake_location)
 
 def path_to_optimal_corner(board_state, snake):
         '''
@@ -89,7 +91,7 @@ def path_to_optimal_corner(board_state, snake):
         '''
         # 0. Set up  target locations
         head = snake.coords[0]
-        start_location = a_star.Node(head.x, head.y)
+        start_location = a_star.Node.from_point(head)
         corners = get_corners(board_state)
 
         # 0b. Build grid
@@ -124,7 +126,7 @@ def path_to_centre(board_state, snake):
         '''
 
         # We're planning a path between our current location and the centre
-        start_location = a_star.Node(snake.coords[0].x, snake.coords[0].y)
+        start_location = a_star.Node.from_point(snake.coords[0])
         centre = a_star.Node(round(board_state.width), round(board_state.height))
 
         # Create the grid to plan on
@@ -140,7 +142,8 @@ def get_next_move_to_centre(board_state, snake):
         '''
         snake_location = snake.coords[0]
         path_to_centre = path_to_centre(board_state, snake)
-        return compute_relative_move(path_to_centre[1], snake_location)
+        target = path_to_centre[1].point
+        return compute_relative_move(target, snake_location)
 
 def compute_relative_move(move, snake_location):
         # Compute the difference (offset by one)
@@ -150,7 +153,7 @@ def compute_relative_move(move, snake_location):
 
 def snake_at_corner(board_state, our_snake) :
     head = our_snake.coords[0]
-    position = a_star.Node(head[0], head[1])
+    position = a_star.Node.from_point(head)
 
     corners = get_corners(board_state)
 

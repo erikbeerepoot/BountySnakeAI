@@ -1,5 +1,7 @@
 import heapq
 
+from bountysnakeai.model import Point
+
 EMPTY = 0
 SNAKE = 1
 FOOD = 2
@@ -29,6 +31,14 @@ class Node(object):
         # node (if our graph is a grid, a naive approach would be to use the
         # manhattan distance as an estimate, for instance)
         self.G = INFINITY
+
+    @property
+    def point(self):
+        return Point(self.x, self.y)
+
+    @classmethod
+    def from_point(cls, point):
+        return Node(point.x, point.y)
 
     def move_cost(self, neighbour):
         # Naively declare that it costs 1 to move from this node to any neighbour
