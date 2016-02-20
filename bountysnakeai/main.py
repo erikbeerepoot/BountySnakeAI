@@ -139,14 +139,8 @@ def move():
         move = helper.circle(board_state, our_snake, previous_move)
     else:
         # Food and Running can lead to Hiding in a corner.
-        if "hiding-in-" not in previous_phase:
-            # Lets pick a place to hide
-            phase = "hiding-in-corner" if random.randint(1,20)==5 else "hiding-in-centre"
-
-        if "hiding-in-corner" in phase:
-            move = helper.get_next_move_to_corner(board_state, our_snake)
-        else:
-            move = helper.get_next_move_to_centre(board_state, our_snake)
+        phase = 'hiding-in-corner'
+        move = helper.get_next_move_to_corner(board_state, our_snake)
 
     log.info(' GAME: %s', game_id)
     log.info('PHASE: %s', phase)
