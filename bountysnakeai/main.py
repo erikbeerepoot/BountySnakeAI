@@ -4,7 +4,7 @@ import os
 import random
 import redis
 import sys
-import copy 
+import copy
 
 from bountysnakeai import helper
 from bountysnakeai import model
@@ -76,7 +76,7 @@ def start():
     private_state = {
         'phase': 'hide',
         'move': None,
-	'taunt': helper.taunt_opponent(snakes_not_us),
+        'taunt': helper.taunt_opponent(snakes_not_us),
     }
 
     db.hmset(game_id, private_state)
@@ -139,14 +139,14 @@ def move():
         move = helper.circle(board_state, our_snake, previous_move)
     else:
         # Food and Running can lead to Hiding in a corner.
-	if "hiding-in-" not in previous_phase:
-		# Lets pick a place to hide
-		phase = "hiding-in-corner" if randint(1,20)==5 else "hiding-in-centre"
-	
-	if "hiding-in-corner" in phase:
-        	move = helper.get_next_move_to_corner(board_state, our_snake)
-	else:
-		move = helper.get_next_move_to_centre(board_state, our_snake)
+        if "hiding-in-" not in previous_phase:
+            # Lets pick a place to hide
+            phase = "hiding-in-corner" if random.randint(1,20)==5 else "hiding-in-centre"
+
+        if "hiding-in-corner" in phase:
+            move = helper.get_next_move_to_corner(board_state, our_snake)
+        else:
+            move = helper.get_next_move_to_centre(board_state, our_snake)
 
     log.info(' GAME: %s', game_id)
     log.info('PHASE: %s', phase)
@@ -155,17 +155,17 @@ def move():
     #log.debug(previous_snakes)
     newly_dead_snakes = helper.get_snakes_that_just_died(board_state.snake_list, previous_snakes)
     if not newly_dead_snakes:
-	# If there are no new dead snakes, taunt every so often    
+        # If there are no new dead snakes, taunt every so often
         if board_state.turn % turns_per_taunt == 0:
-	    alive_snakes = filter(lambda snake : snake.status == "alive", board_state.snake_list)
+            alive_snakes = filter(lambda snake : snake.status == "alive", board_state.snake_list)
             taunt = helper.taunt_opponent(alive_snakes)
-	    private_state['taunt'] = taunt
-	else:
-	    taunt = private_state['taunt']
+            private_state['taunt'] = taunt
+        else:
+            taunt = private_state['taunt']
     else:
-	taunt = helper.taunt_opponent(newly_dead_snakes,fatality=True)
-	private_state['taunt'] = taunt
-	
+        taunt = helper.taunt_opponent(newly_dead_snakes,fatality=True)
+        private_state['taunt'] = taunt
+
     previous_snakes = copy.deepcopy(board_state.snake_list)
     private_state['move'] = move
     private_state['phase'] = phase

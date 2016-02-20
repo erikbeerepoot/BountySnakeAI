@@ -5,7 +5,6 @@ import random
 from bountysnakeai import a_star
 from bountysnakeai import model
 from bountysnakeai import snakeID
-from random import randint 
 
 log = logging.getLogger(__name__)
 
@@ -320,81 +319,80 @@ def circle(board_state, our_snake, previous_move):
         raise AssertionError('Failed to find a point to move to after turning clockwise four times!')
 
 def taunt_opponent(snakes,fatality=False):
-	'''
-	Selects one of the other snakes on the board and taunts it
-	'''
-	taunts = [
-		' is about to get creamed by this snake',
-		' looks drunk',
-		' needs to try harder',
-		' is clearly built out of crayon code',
-		' needs a little help from his friends',
-		' needs less leaf fru-fru, and more performance',
-		', food is for weak snakes',
-		' is on hunger strike',
-		' is a dirty camper',
-		' has no courage',
-		' will be trounced',
-		'\'s creator spends too much time on reddit',
-		', last chance to back out',
-		' doesn\'t know when to quit',
-		' has no sense of pride',
-	]
+    '''
+    Selects one of the other snakes on the board and taunts it
+    '''
+    taunts = [
+        ' is about to get creamed by this snake',
+        ' looks drunk',
+        ' needs to try harder',
+        ' is clearly built out of crayon code',
+        ' needs a little help from his friends',
+        ' needs less leaf fru-fru, and more performance',
+        ', food is for weak snakes',
+        ' is on hunger strike',
+        ' is a dirty camper',
+        ' has no courage',
+        ' will be trounced',
+        '\'s creator spends too much time on reddit',
+        ', last chance to back out',
+        ' doesn\'t know when to quit',
+        ' has no sense of pride',
+    ]
 
-	fatal_taunts = [
-		' can\'t stop killing itself',
-		', the walls are not for eating',
-		', winners don\'t use drugs',
-		' bit the dust',
-		' died. AGAIN.',
-		' employs Kamikaze tactics',
-		' is 6 feet below',
-		' went to a better place',
-		' was de-snaked',
-		' is FINISHED!',
-		' is starting to smell funky',
-		' didn\'t even stand a chance',
-		', better luck next time!',
-		', is sleeping on the job',
-		', makes dying look easy',
-		', please don\'t cry',
-		', is reconsidering some life choices',
-	]
+    fatal_taunts = [
+        ' can\'t stop killing itself',
+        ', the walls are not for eating',
+        ', winners don\'t use drugs',
+        ' bit the dust',
+        ' died. AGAIN.',
+        ' employs Kamikaze tactics',
+        ' is 6 feet below',
+        ' went to a better place',
+        ' was de-snaked',
+        ' is FINISHED!',
+        ' is starting to smell funky',
+        ' didn\'t even stand a chance',
+        ', better luck next time!',
+        ', is sleeping on the job',
+        ', makes dying look easy',
+        ', please don\'t cry',
+        ', is reconsidering some life choices',
+    ]
 
-	#Get all snakes that aren't us
-	enemy_snakes = filter(lambda snake : snake.id != snakeID, snakes)
-	if len(enemy_snakes) < 1:
-		return ""
-	#Randomly pick one
-	snake = enemy_snakes[randint(0,len(enemy_snakes)-1)]
+    #Get all snakes that aren't us
+    enemy_snakes = filter(lambda snake : snake.id != snakeID, snakes)
+    if len(enemy_snakes) < 1:
+        return ""
+    #Randomly pick one
+    snake = enemy_snakes[random.randint(0,len(enemy_snakes)-1)]
 
-	#Randomly pick an appropriate taunt
-	if fatality:
-		taunt = fatal_taunts[randint(0,len(fatal_taunts)-1)]
-	else:
-		taunt = taunts[randint(0,len(taunts)-1)]
-	
-	final_taunt_string = str(snake.name) + taunt 
-	log.debug("Taunting: %s", final_taunt_string)
-	return final_taunt_string
+    #Randomly pick an appropriate taunt
+    if fatality:
+        taunt = fatal_taunts[random.randint(0,len(fatal_taunts)-1)]
+    else:
+        taunt = taunts[random.randint(0,len(taunts)-1)]
+
+    final_taunt_string = str(snake.name) + taunt 
+    log.debug("Taunting: %s", final_taunt_string)
+    return final_taunt_string
 
 def get_snakes_that_just_died(snakes,previous_snakes):
-	'''
-	Returns any snakes that died in the last turn
-	'''
+    '''
+    Returns any snakes that died in the last turn
+    '''
 
-	if len(snakes) < 1 or len(previous_snakes) < 1:
-		return []
+    if len(snakes) < 1 or len(previous_snakes) < 1:
+        return []
 
-	if len(snakes) == len(previous_snakes):
-		return []
-	else:
-		#Dead snake will just disappear from the snake list
-		current_snakes = set(snakes)
-		new_dead_snakes = [ snake for snake in previous_snakes if snake not in current_snakes] 
+    if len(snakes) == len(previous_snakes):
+        return []
+    else:
+        #Dead snake will just disappear from the snake list
+        current_snakes = set(snakes)
+        new_dead_snakes = [ snake for snake in previous_snakes if snake not in current_snakes] 
 
-		for dead_snake in new_dead_snakes:
-			log.debug("Found new dead snake: %s", dead_snake.name)
+        for dead_snake in new_dead_snakes:
+            log.debug("Found new dead snake: %s", dead_snake.name)
 
-		return new_dead_snakes
-	
+        return new_dead_snakes
