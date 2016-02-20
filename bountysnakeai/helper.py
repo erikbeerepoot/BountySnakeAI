@@ -24,8 +24,7 @@ def get_corners(board_state):
 
 def should_hunt_for_food(board_state, snake):
     path, cost = plan_path_to_food(board_state, snake)
-    log.debug(path)
-    log.debug(cost)
+    log.debug('Have %s health; nearest food is %s away', snake.health, cost if cost != a_star.INFINITY else 'INF')
     if cost == a_star.INFINITY:
         # there is no food!
         return False
