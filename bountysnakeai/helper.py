@@ -34,7 +34,7 @@ def get_next_move_to_food(board_state, snake):
         '''
         path, cost = plan_path_to_food(board_state, snake)
         if path:
-            target = path[0].point
+            target = path[1].point
             log.debug('Target move: %s', target)
 
             # Turn path into a move we can pass back
