@@ -195,3 +195,39 @@ def find_path(grid, start, goal):
         #Return an empty path
         print("No path found, returning empty path list")
         return []
+
+def print_grid(grid, start, goal, path=None):
+    if not path: path = []
+
+    width = len(grid[0])
+    height = len(grid)
+    output = []
+
+    line = ['+', '-'*(width*4+1), '+']
+    output.append(''.join(line))
+
+    for y in range(0, height):
+        line = ['|']
+        for x in range(0, width):
+            curr_node = Node(x, y)
+
+            if curr_node == start:
+                line.append('AAA')
+            elif curr_node == goal:
+                line.append('BBB')
+            elif grid[x][y].contents == SNAKE:
+                line.append(' S ')
+            elif grid[x][y].contents == FOOD:
+                line.append(' F ')
+            elif curr_node in path:
+                line.append('% 3s' % 'o')
+            else:
+                #line.append(' ')
+                line.append('% 3s' % grid[x][y].G if grid[x][y].G != INFINITY else 'INF')
+
+        line.append('|')
+        output.append(' '.join(line))
+
+    line = ['+', '-'*(width*4+1), '+']
+    output.append(''.join(line))
+    print '\n'.join(output)
