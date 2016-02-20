@@ -8,7 +8,7 @@ import sys
 from bountysnakeai import helper
 from bountysnakeai import model
 from bountysnakeai import log
-from bountysnakeai import snakeID
+from bountysnakeai import snakeID,turns_per_taunt
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
@@ -138,7 +138,7 @@ def move():
     log.info('PHASE: %s', phase)
     log.info(' MOVE: %s', move)
 
-    if board_state.turn % 10:
+    if board_state.turn % turns_per_taunt == 0:
 	    taunt = helper.taunt_opponent(board_state)
 	    private_state['taunt'] = taunt
     else:

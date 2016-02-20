@@ -11,3 +11,4 @@ stdout_handler.setFormatter(formatter)
 log.addHandler(stdout_handler)
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
+turns_per_taunt = 20
