@@ -10,7 +10,6 @@ from bountysnakeai import model
 from bountysnakeai import log
 from bountysnakeai import snakeID
 
-taunts = [u"We're winning"]
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
 
@@ -72,6 +71,7 @@ def start():
     private_state = {
         'phase': 'hide',
         'move': None,
+	'taunt': helper.taunt_opponent(board_state),
     }
     db.hmset(game_id, private_state)
     # TODO: Make sure unauthorized calls aren't overwriting an existing game state.
@@ -80,7 +80,7 @@ def start():
 
     # The game is about to start! Quick -- taunt the enemy!
     return {
-        u'taunt': u'battlesnake-python!'
+        u'taunt': private_state['taunt']
     }
 
 
@@ -137,13 +137,20 @@ def move():
     log.info(' GAME: %s', game_id)
     log.info('PHASE: %s', phase)
     log.info(' MOVE: %s', move)
+
+    if board_state.turn % 10:
+	    taunt = helper.taunt_opponent(board_state)
+	    private_state['taunt'] = taunt
+    else:
+            taunt = private_state['taunt']
+
     private_state['move'] = move
     private_state['phase'] = phase
     db.hmset(game_id, private_state)
 
     return {
         u'move': move,
-        u'taunt': helper.taunt_opponent(board_state) 
+        u'taunt': taunt
     }
 
 
