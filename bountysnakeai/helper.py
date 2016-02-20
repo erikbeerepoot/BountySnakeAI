@@ -148,6 +148,8 @@ def compute_relative_move(move, snake_location):
     delta_x = move.x - snake_location.x
     delta_y = move.y - snake_location.y
 
+    log.debug("Moving from %s to %s?", move, snake_location)
+
     # Ensure we're moving exactly one square north, south, east, or west
     assert abs(delta_x) + abs(delta_y) == 1
 
