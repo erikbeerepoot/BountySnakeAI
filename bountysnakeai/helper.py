@@ -59,7 +59,7 @@ def path_to_optimal_corner(board_state, snake):
         '''
         # 0. Set up  target locations
         head = snake.coords[0]
-        startLocation = Node(head.x, head.y)
+        start_location = a_star.Node(head.x, head.y)
         corners = [
             a_star.Node(0, 0), # top left
             a_star.Node(0, board_state.width-1), # top right
@@ -72,7 +72,7 @@ def path_to_optimal_corner(board_state, snake):
 
         # 1. Plan a path to each corner
         paths = [
-            a_star.find_path(grid, startLocation, corner)
+            a_star.find_path(grid, start_location, corner)
             for corner in corners
         ]
 
@@ -85,7 +85,7 @@ def path_to_optimal_corner(board_state, snake):
         triples.sort(key=lambda t: t[2]) # sort by cost
         optimal_corner, optimal_path, optimal_cost = triples[0]
 
-        if optimal_cost == INFINITY:
+        if optimal_cost == a_star.INFINITY:
             # We couldn't find a good path :(
             log.debug('Could find no optimal corner')
             return []
