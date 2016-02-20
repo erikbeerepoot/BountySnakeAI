@@ -200,12 +200,15 @@ def corner_threshold(cost, snake):
     return cost < 5
 
 def circle(board_state, our_snake, previous_move):
-
+    # Consider just enough of our snake to make up one side of the smallest
+    # square box that it can circle around.
     snake_length = len(our_snake.coords)
-    # Consider just over a quarter of our snake
-    quarter = snake_length//4 + 1
+    for side_length in xrange(2, snake_length):
+        box_size = side_length**2 - (side_length-2)**2
+        if box_size > snake_length:
+            break
     head_point = our_snake.coords[0]
-    front_points = our_snake.coords[:quarter]
+    front_points = our_snake.coords[:side_length]
 
     grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list)
 
@@ -221,14 +224,14 @@ def circle(board_state, our_snake, previous_move):
     log.debug('front_points=%s', front_points)
     if (previous_move in ['north', 'south'] and not all(point.x == head_point.x for point in front_points)) \
     or (previous_move in ['east', 'west']   and not all(point.y == head_point.y for point in front_points)):
-        # If the front quarter of the snake isn't all going in the same
+        # If the first side length of the snake isn't all going in the same
         # direction then continue, if possible, in the previous direction
         preferred_direction = previous_move
-        log.debug('Haven\'t moved 1/4 length yet. Stay the course %s.', preferred_direction)
+        log.debug('Haven\'t moved a side length yet. Stay the course %s.', preferred_direction)
     else:
         # Otherwise, we'd like to turn clockwise.
         preferred_direction = next_clockwise[previous_move]
-        log.debug('Moved 1/4 length, trying to turn %s!', preferred_direction)
+        log.debug('Moved one side length, trying to turn %s!', preferred_direction)
 
     path = []
     start_node = a_star.Node.from_point(head_point)
