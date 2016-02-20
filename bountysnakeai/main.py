@@ -143,7 +143,7 @@ def move():
 
     return {
         u'move': move,
-        u'taunt': random.choice(taunts)
+        u'taunt': helper.taunt_opponent(board_state) 
     }
 
 
