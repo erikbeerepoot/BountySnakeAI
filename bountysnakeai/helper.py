@@ -202,10 +202,8 @@ def corner_threshold(cost, snake):
 def circle(board_state, our_snake, previous_move):
 
     snake_length = len(our_snake.coords)
-    # Round up to nearest multiple of 4
-    snake_length = snake_length + ((4 - (snake_length % 4)) % 4)
-    quarter = snake_length//4
-    # Look at the head-quarter of the snake:
+    # Consider just over a quarter of our snake
+    quarter = snake_length//4 + 1
     head_point = our_snake.coords[0]
     front_points = our_snake.coords[:quarter]
 
