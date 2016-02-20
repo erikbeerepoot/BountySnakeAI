@@ -76,6 +76,8 @@ def start():
     db.hmset(game_id, private_state)
     # TODO: Make sure unauthorized calls aren't overwriting an existing game state.
 
+    log.info("BEGINNING GAME %s", game_id)
+
     # The game is about to start! Quick -- taunt the enemy!
     return {
         u'taunt': u'battlesnake-python!'
@@ -93,6 +95,7 @@ def move():
     # Parse the game state out of the request body
     json_dict = bottle.request.json
     log.debug(json_dict)
+    log.info("MOVE CALLED")
 
     board_state = model.BoardState(json_dict)
 
@@ -156,6 +159,8 @@ def end():
     game_id = board_state.game
     db.delete(game_id)
     # TODO: Make sure unauthorized calls aren't trying to delete a game state.
+
+    log.info("ENDING GAME %s", game_id)
 
     # The game is over -- any response will be ignored
     return {

@@ -1,6 +1,9 @@
 import heapq
+import logging
 
 from bountysnakeai.model import Point
+
+log = logging.getLogger(__name__)
 
 EMPTY = 0
 SNAKE = 1
@@ -203,7 +206,7 @@ def find_path(grid, start, goal):
                 heappush(openheap, node)
     else:
         #Return an empty path
-        print("No path found, returning empty path list")
+        log.debug('No path found, returning empty path list')
         return []
 
 def print_grid(grid, start, goal, path=None):

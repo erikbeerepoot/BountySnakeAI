@@ -1,8 +1,10 @@
+import logging
 import math
 
 from bountysnakeai import a_star
 from bountysnakeai import model
-from bountysnakeai import log
+
+log = logging.getLogger(__name__)
 
 def getSnake(board_state, snake_id):
     for snake in board_state.snake_list:
