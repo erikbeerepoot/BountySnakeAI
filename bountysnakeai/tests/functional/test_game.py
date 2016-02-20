@@ -61,14 +61,10 @@ class TestGame(ControllerTestCase):
         self.assertEqual(response.status, '200 OK')
 
         json_body = json.loads(response.body)
-        self.assertEqual(json_body, {
-            u'taunt': u'battlesnake-python!',
-        })
-
+        self.assertTrue(isinstance(json_body['taunt'], basestring))
+        
         private_state = main.db.hgetall(u'test-game')
-        self.assertEqual(private_state, {
-            'phase': 'hide',
-        })
+        self.assertEqual(private_state['phase'], 'hide')
 
     def test_move_failure(self):
         app = TestApp(main.application)
