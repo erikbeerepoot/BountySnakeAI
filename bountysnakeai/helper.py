@@ -24,11 +24,10 @@ def should_hunt_for_food(board_state, snake):
     path, cost = plan_path_to_food(board_state, snake)
     log.debug('Have %s health; nearest food is %s away', snake.health, cost if cost != a_star.INFINITY else 'INF')
     if cost == a_star.INFINITY:
-        # there is no food!
+        # There is no reachable food :(
         return False
-    elif snake.health < 80:
-        # If our snake is going to die by the time it gets there, move to
-        # the nearest food
+    elif (snake.health < 50) or (snake.health < cost*2):
+        # If our snake is below 50% health, or food is far away, hunt!
         return True
     else:
         return False
