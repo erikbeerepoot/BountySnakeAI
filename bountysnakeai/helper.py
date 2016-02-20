@@ -1,5 +1,6 @@
 import logging
 import math
+import random
 
 from bountysnakeai import a_star
 from bountysnakeai import model
@@ -72,6 +73,64 @@ def plan_path_to_food(board_state, snake):
         paths_plus_costs = zip(paths_to_food, path_costs)
         paths_plus_costs.sort(key=lambda t: t[1])
         return paths_plus_costs[0]
+
+def is_too_risky_nearby(board_state, snake):
+    # Construct a grid for our risk-averse snake
+    grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list, risk_averse=True)
+    head = snake.coords[0]
+
+    # Determine if it's too risky
+    node = grid[head.x][head.y]
+    log.debug(' LOCAL RISKINESS: %.1f', node.riskiness)
+    return (node.riskiness > 2)
+
+def get_to_safety(board_state, snake):
+    safest_path = get_safest_path(board_state, snake)
+    safest_direction = compute_relative_move(safest_path[0], safest_path[1])
+    return safest_direction
+
+def get_safest_path(board_state, snake):
+    # Construct a grid for our risk-averse snake!
+    grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list, risk_averse=True)
+
+    # A node to represent our snake's head
+    head = snake.coords[0]
+    start_location = a_star.Node.from_point(head)
+
+    # Pick 30 random locations on the board
+    candidates = [
+        grid[
+            random.randint(0, board_state.width-1)
+        ][
+            random.randint(0, board_state.height-1)
+        ]
+        for _ in xrange(30)
+    ]
+    log.debug('GLOBAL RISKINESS: %s', ', '.join('%.1f'%c.riskiness for c in candidates if c.riskiness))
+
+    # For each location, see which is the least risky to get to
+    paths = [
+        a_star.find_path(grid, start_location, candidate)
+        for candidate in candidates
+    ]
+    # Filter out any that we just can't get, or that start and end in the
+    # same place, and sort by cost (incorporates riskiness)
+    tuples = [
+        (path, path[-1].G)
+        for path in paths
+        if len(path) > 1
+    ]
+    tuples.sort(key=lambda t: t[1])
+    optimal_path, optimal_cost = tuples[0]
+
+    if not tuples:
+        # None of the 20 randomly selected points is reachable!
+        log.debug('Could find no safe squares!')
+        return []
+    else:
+        target_node = optimal_path[-1]
+        log.debug('Picked the least risky path. Heading to %s,%s', target_node.x, target_node.y)
+        return optimal_path
 
 def get_next_move_to_corner(board_state, snake):
         '''

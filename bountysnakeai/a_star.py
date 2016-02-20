@@ -13,7 +13,7 @@ INFINITY = 2**32 - 1 # For simplicity, just use a very high number...
 
 class Node(object):
     __slots__ = [
-        'x', 'y', 'contents', 'parent', 'H', 'G',
+        'x', 'y', 'contents', 'parent', 'H', 'G', 'riskiness',
     ]
     def __init__(self, x, y, contents=EMPTY):
         # Coordinates of this node on the board.
@@ -35,6 +35,8 @@ class Node(object):
         # manhattan distance as an estimate, for instance)
         self.G = INFINITY
 
+        self.riskiness = 0
+
     @property
     def point(self):
         return Point(self.x, self.y)
@@ -44,9 +46,8 @@ class Node(object):
         return Node(point.x, point.y)
 
     def move_cost(self, neighbour):
-        # Naively declare that it costs 1 to move from this node to any neighbour
-        # TODO: come up with a better heuristic for the move cost
-        return 1
+        # It costs at least 1 to move from this node to any neighbour
+        return neighbour.riskiness + 1
 
     # XXX: Define equality comparisons as being based on the coordinates
     #      occupied by the Node. This makes it possible to do set membership
@@ -87,7 +88,7 @@ class Node(object):
             '' if self.parent is None else 'Node(...)',
         )
 
-def build_grid(width, height, snakes, food):
+def build_grid(width, height, snakes, food, risk_averse=False):
     grid = [
         [Node(x, y) for y in xrange(height)]
         for x in xrange(width)
@@ -96,6 +97,20 @@ def build_grid(width, height, snakes, food):
         for p in snake.coords:
             node = grid[p.x][p.y]
             node.contents = SNAKE
+            if risk_averse:
+                # For a distance of 3 squares, the riskiness of each square is
+                # increased, inversely proportional to distance, by the presence
+                # of this snake square.
+                for d_x in xrange(-3, 3):
+                    for d_y in xrange(-3, 3):
+                        if d_x == 0 and d_y == 0:
+                            continue
+                        try:
+                            nearby_node = grid[p.x+d_x][p.y+d_y]
+                        except IndexError:
+                            pass
+                        else:
+                            nearby_node.riskiness += 2.0/manhattan(node, nearby_node)
     for p in food:
         node = grid[p.x][p.y]
         # If we're overwriting a snake there's a problem. Ensure valid state:

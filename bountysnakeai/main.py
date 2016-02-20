@@ -118,13 +118,19 @@ def move():
     previous_move = private_state['move']
 
     if helper.should_hunt_for_food(board_state, our_snake):
-        #Compute our move relative to the current position 
+        # Any stage can lead to hunting if you get hungry enough.
         phase = 'food'
         move = helper.get_next_move_to_food(board_state, our_snake)
+    elif helper.is_too_risky_nearby(board_state, our_snake):
+        # Any stage can lead to Running, if it's risky enough nearby.
+        phase = 'running'
+        move = helper.get_to_safety(board_state, our_snake)
     elif (previous_phase == 'circle') or helper.snake_at_corner(board_state, our_snake):
+        # Hiding should result in finding a corner, which leads to Circling.
         phase = 'circle'
         move = helper.circle(board_state, our_snake, previous_move)
     else:
+        # Food and Running can lead to Hiding in a corner.
         phase = 'hiding'
         move = helper.get_next_move_to_corner(board_state, our_snake)
 
