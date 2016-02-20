@@ -48,7 +48,7 @@ def plan_path_to_food(board_state, snake):
            return ([], a_star.INFINITY)
 
         # Create the grid for a*
-        grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
+        grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list)
 
         start_node = a_star.Node.from_point(snake.coords[0])
 
@@ -88,7 +88,7 @@ def path_to_optimal_corner(board_state, snake):
         corners = get_corners(board_state)
 
         # 0b. Build grid
-        grid = a_star.build_grid(board_state.width, board_state.height, [], [])
+        grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list)
 
         # 1. Plan a path to each corner
         paths = [
@@ -123,7 +123,7 @@ def path_to_centre(board_state, snake):
         centre = a_star.Node(board_state.width//2, board_state.height//2)
 
         # Create the grid to plan on
-        grid = a_star.build_grid(board_state.width, board_state.height, [], [])
+        grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list)
 
         # Actually plan the path
         path_to_centre = a_star.find_path(grid, start_location, centre)
