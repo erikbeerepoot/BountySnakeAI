@@ -14,7 +14,15 @@ taunts = [u"We're winning"]
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
 
+def log_json(fn):
+    def wrapped(*args, **kwargs):
+        result = fn(*args, **kwargs)
+        log.debug('Response: %r', result)
+        return result
+    return wrapped
+
 @bottle.route('/static/<path:path>')
+@log_json
 def static(path):
     """
     Serve up static files.
@@ -23,6 +31,7 @@ def static(path):
 
 
 @bottle.get('/')
+@log_json
 def index():
     """
     Serve up some basic style information for our snakes.
@@ -39,6 +48,7 @@ def index():
 
 
 @bottle.post('/start')
+@log_json
 def start():
     """
     Initialize a new game.
@@ -73,6 +83,7 @@ def start():
 
 
 @bottle.post('/move')
+@log_json
 def move():
     """
     Process a 'move' on the game board.
@@ -124,6 +135,7 @@ def move():
 
 
 @bottle.post('/end')
+@log_json
 def end():
     """
     End a game and clean up.
