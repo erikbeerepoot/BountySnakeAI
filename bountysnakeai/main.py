@@ -4,6 +4,7 @@ import os
 import random
 import redis
 import sys
+import copy 
 
 from bountysnakeai import helper
 from bountysnakeai import model
@@ -12,6 +13,7 @@ from bountysnakeai import snakeID,turns_per_taunt
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
+previous_snakes = []
 
 def log_json(fn):
     def wrapped(*args, **kwargs):
@@ -66,13 +68,17 @@ def start():
             u'error' : u'You gave us invalid data! Missing key in json dict: ' + e.message 
         }
 
+    snakes_not_us = filter(lambda snake : snake.id != snakeID, board_state.snake_list)
+    previous_snakes = copy.deepcopy(snakes_not_us)
+
     # at game start, default to hide phase
     game_id = board_state.game
     private_state = {
         'phase': 'hide',
         'move': None,
-	'taunt': helper.taunt_opponent(board_state),
+	'taunt': helper.taunt_opponent(snakes_not_us),
     }
+
     db.hmset(game_id, private_state)
     # TODO: Make sure unauthorized calls aren't overwriting an existing game state.
 
@@ -92,6 +98,8 @@ def move():
 
     return a direction to move in and a taunt.
     """
+    global previous_snakes
+
     # Parse the game state out of the request body
     json_dict = bottle.request.json
     log.debug(json_dict)
@@ -131,10 +139,9 @@ def move():
         move = helper.circle(board_state, our_snake, previous_move)
     else:
         # Food and Running can lead to Hiding in a corner.
-
 	if "hiding-in-" not in previous_phase:
 		# Lets pick a place to hide
-		phase = "hiding-in-corner" if randint(1,20)==5 else "hiding-in-centre"
+		phase = "hiding-in-corner" if random.randint(1,20)==5 else "hiding-in-centre"
 	
 	if "hiding-in-corner" in phase:
         	move = helper.get_next_move_to_corner(board_state, our_snake)
@@ -145,12 +152,22 @@ def move():
     log.info('PHASE: %s', phase)
     log.info(' MOVE: %s', move)
 
-    if board_state.turn % turns_per_taunt == 0:
-	    taunt = helper.taunt_opponent(board_state)
+    #log.debug(previous_snakes)
+    newly_dead_snakes = helper.get_snakes_that_just_died(board_state.snake_list, previous_snakes)
+    if not newly_dead_snakes:
+	# If there are no new dead snakes, taunt every so often    
+        if board_state.turn % turns_per_taunt == 0:
+	    alive_snakes = filter(lambda snake : snake.status == "alive", board_state.snake_list)
+            taunt = helper.taunt_opponent(alive_snakes)
 	    private_state['taunt'] = taunt
+	else:
+	    taunt = private_state['taunt']
     else:
-            taunt = private_state['taunt']
-
+	taunt = helper.taunt_opponent(newly_dead_snakes,fatality=True)
+	private_state['taunt'] = taunt
+	
+	
+    previous_snakes = copy.deepcopy(board_state.snake_list)
     private_state['move'] = move
     private_state['phase'] = phase
     db.hmset(game_id, private_state)

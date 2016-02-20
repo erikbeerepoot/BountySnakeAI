@@ -312,32 +312,68 @@ def circle(board_state, our_snake, previous_move):
     else:
         raise AssertionError('Failed to find a point to move to after turning clockwise four times!')
 
-def taunt_opponent(board_state,fatality=False):
+def taunt_opponent(snakes,fatality=False):
 	'''
 	Selects one of the other snakes on the board and taunts it
 	'''
 	taunts = [
 		' is about to get creamed by this snake',
 		' looks drunk',
+		' needs to try harder',
+		', YOU SUCK!!!',
 		' is clearly built out of crayon code',
 		' needs a little help from his friends',
 		'! resistance is futile. You will be assimilated (into Workday\'s coorporate hierarchy)',
 		', Dave Duffield is shaking his head at you right now',
-		' doesn\'t look like it needs any help dying',
 		' needs less leaf fru-fru, and more performance',
 		', food is for weak snakes',
-		' is on hunger strike'
+		' is on hunger strike',
+		' is a dirty camper',
+		'\'s feet smell bad',
+		'\'s creator needs a shower',
+		'\'s creator needs programming lessons',
+		'\'s company needs better programmers',
+		' has no courage',
+		' is a failure',
+		' disappoints. again.'
+		' will be trounced',
+		'\'s creator spends too much time on reddit',
+		', you\'re not cut out for this',
+		', just give up now!',
+		', last chance to back out',
+		' doesn\'t know when to quit',
+		' has no sense of pride',
+		'\'s creator is cross-eyed',
 	]
 
        	fatal_taunts = [
 		' can\'t stop killing itself',
 		', the walls are not for eating',
 		' really needs to try harder',
-		', winners don\'t use drugs'
+		', winners don\'t use drugs',
+		' bit the dust',
+		' died. AGAIN.',
+		' employs Kamikaze tactics',
+		' is 6 feet below',
+		' went to a better place',
+		' was de-snaked',
+		' is FINISHED!',
+		' makes this place smell like DEATH',
+		' didn\'t even stand a chance',
+		', better luck next time!',
+		', are you even trying?',
+		', is sleeping on the job',
+		', stop embarassing yourself',
+		', makes dying look easy',
+		', please don\'t cry',
+		', needs programming help',
+		', needs to reconsider their life choices',
+		' should just give up',
+		' doesn\'t need help dying',
 	]
 
 	#Get all snakes that aren't us
-	enemy_snakes = filter(lambda snake : snake.id != snakeID and snake.status=="alive", board_state.snake_list)
+	enemy_snakes = filter(lambda snake : snake.id != snakeID, snakes)
 	if len(enemy_snakes) < 1:
 		return ""
 	#Randomly pick one
@@ -353,3 +389,26 @@ def taunt_opponent(board_state,fatality=False):
 	log.debug("Taunting: %s", final_taunt_string)
 	return final_taunt_string
 
+def get_snakes_that_just_died(snakes,previous_snakes):
+	'''
+	Returns any snakes that died in the last turn
+	'''
+
+	if len(snakes) < 1 or len(previous_snakes) < 1:
+		return []
+
+	log.debug("snakes:")
+	log.debug(snakes)
+	log.debug(previous_snakes)
+
+	dead_snakes = filter(lambda snake : snake.status != "alive",snakes)
+	previous_dead_snakes = filter(lambda snake : snake.status != "alive",previous_snakes)
+
+	previous_dead_snakes_set = set(previous_dead_snakes)
+	new_dead_snakes = [ snake for snake in dead_snakes if snake not in previous_dead_snakes_set] 
+
+	for dead_snake in new_dead_snakes:
+		log.debug("Found new dead snake: %s", dead_snake.name)
+
+	return new_dead_snakes
+	
