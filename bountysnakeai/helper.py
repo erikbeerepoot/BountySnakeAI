@@ -118,7 +118,7 @@ def get_safest_path(board_state, snake):
     # Filter out any that we just can't get, or that start and end in the
     # same place, and sort by cost (incorporates riskiness)
     tuples = [
-        (path, path[-1].G)
+        (path, path[1].G*4 + path[-1].G)
         for path in paths
         if len(path) > 1
     ]
@@ -131,7 +131,7 @@ def get_safest_path(board_state, snake):
         return []
     else:
         target_node = optimal_path[-1]
-        log.debug('Picked the least risky path. Heading to %s,%s', target_node.x, target_node.y)
+        log.debug('Picked the least risky path. Cost: %s. Heading to %s,%s', optimal_cost, target_node.x, target_node.y)
         return optimal_path
 
 def get_next_move_to_corner(board_state, snake):
