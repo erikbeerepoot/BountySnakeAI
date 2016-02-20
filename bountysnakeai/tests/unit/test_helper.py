@@ -12,7 +12,6 @@ class TestHelper(TestCase):
         bs = model.BoardState(json_dict)
 
 	taunt = helper.taunt_opponent(bs)
-	print(taunt)
 	assert(len(taunt)>0)
 
 
