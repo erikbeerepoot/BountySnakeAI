@@ -16,10 +16,10 @@ def getSnake(board_state, snake_id):
 
 def get_corners(board_state):
     return [
-        a_star.Node(0, 0), # top left
-        a_star.Node(0, board_state.width-1), # top right
-        a_star.Node(board_state.height-1, board_state.width-1), # bottom left
-        a_star.Node(board_state.height-1, 0), # bottom right
+        a_star.Node(2, 2), # top left-ish
+        a_star.Node(2, board_state.width-3), # top right-ish
+        a_star.Node(board_state.height-3, board_state.width-3), # bottom left-ish
+        a_star.Node(board_state.height-3, 2), # bottom right-ish
     ]
 
 def should_hunt_for_food(board_state, snake):
