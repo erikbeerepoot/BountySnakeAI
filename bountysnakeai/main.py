@@ -111,18 +111,22 @@ def move():
     if not our_snake:
         bottle.abort(400, u"Bad Request: my snake is missing!")
 
+    previous_phase = private_state['phase']
+    previous_move = private_state['move']
+
     if helper.should_hunt_for_food(board_state, our_snake):
         #Compute our move relative to the current position 
-        private_state['phase'] = 'food'
+        phase = 'food'
         move = helper.get_next_move_to_food(board_state, our_snake)
-    elif (private_state['phase'] == 'circle') or helper.snake_at_corner(board_state, our_snake):
-        private_state['phase'] = 'circle'
-        move = helper.circle(board_state, our_snake, private_state['move'])
+    elif (previous_phase == 'circle') or helper.snake_at_corner(board_state, our_snake):
+        phase = 'circle'
+        move = helper.circle(board_state, our_snake, previous_move)
     else:
-        private_state['phase'] = 'hiding'
+        phase = 'hiding'
         move = helper.get_next_move_to_corner(board_state, our_snake)
 
     private_state['move'] = move
+    private_state['phase'] = phase
     db.hmset(game_id, private_state)
 
     print("Move: " + move )

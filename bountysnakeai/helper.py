@@ -181,26 +181,26 @@ def corner_threshold(cost, snake):
     #TODO: make this a function of snake length
     return cost < 5
 
-def circle(board_state, our_snake, move):
+def circle(board_state, our_snake, previous_move):
 
     quarter = len(our_snake.coords)//4
 
     grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
 
     #Check if quarters worth of snake is going in the same direction. If not, continue if allowed
-    if (move == 'north' or move == 'south'):
+    if (previous_move == 'north' or previous_move == 'south'):
         for coord in our_snake.coords[:quarter]:
-            if (our_snake.coords[0][0] != coord[0] and move_allowed(move, grid, our_snake.coords[0])):
+            if (our_snake.coords[0][0] != coord[0] and move_allowed(previous_move, grid, our_snake.coords[0])):
                 #continue in same direction if allowed
-                return move
+                return previous_move
     else:
         for coord in our_snake.coords[:quarter]:
-            if (our_snake.coords[0][1] != coord[1] and move_allowed(move, grid, our_snake.coords[0])):
+            if (our_snake.coords[0][1] != coord[1] and move_allowed(previous_move, grid, our_snake.coords[0])):
                 #continue in same direction if allowed
-                return move
+                return previous_move
 
     #3rd. We need to turn. Choose direction that doesn't suck
-    return choose_move(move, our_snake.coords[0][0], grid)
+    return choose_move(previous_move, our_snake.coords[0][0], grid)
 
 def move_allowed(direction, grid, head):
     try :
