@@ -280,6 +280,13 @@ def circle(board_state, our_snake, previous_move):
         'west': 'north',
         'None': 'west', # if there is no previous move, try to head west
     }
+    next_counterclockwise = {
+        'north': 'west',
+        'west': 'south',
+        'south': 'east',
+        'east': 'north',
+        'None': 'west', # if there is no previous move, try to head west
+    }
 
     log.debug('Previous move: %s', previous_move)
     log.debug('front_points=%s', front_points)
@@ -306,7 +313,7 @@ def circle(board_state, our_snake, previous_move):
             return compute_relative_move(path[0].point, path[1].point)
         else:
             # If we didn't find a path forward, try turning clockwise again...
-            preferred_direction = next_clockwise[preferred_direction]
+            preferred_direction = next_counterclockwise[preferred_direction]
             log.debug('Nowhere to go, trying to turn %s!', preferred_direction)
 
     else:
