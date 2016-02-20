@@ -313,7 +313,7 @@ def taunt_opponent(board_state,fatality=False):
 	]
 
 	#Get all snakes that aren't us
-	enemy_snakes = filter(lambda snake : snake.id != snakeID, board_state.snake_list)
+	enemy_snakes = filter(lambda snake : snake.id != snakeID and snake.status=="alive", board_state.snake_list)
 	if len(enemy_snakes) < 1:
 		return ""
 	#Randomly pick one
