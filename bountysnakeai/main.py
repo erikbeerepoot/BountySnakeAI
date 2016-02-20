@@ -141,7 +141,7 @@ def move():
         # Food and Running can lead to Hiding in a corner.
 	if "hiding-in-" not in previous_phase:
 		# Lets pick a place to hide
-		phase = "hiding-in-corner" if randint(1,20)==5 else "hiding-in-centre"
+		phase = "hiding-in-corner" if random.randint(1,20)==5 else "hiding-in-centre"
 	
 	if "hiding-in-corner" in phase:
         	move = helper.get_next_move_to_corner(board_state, our_snake)
