@@ -45,6 +45,7 @@ def get_next_move_to_food(board_state, snake):
                 log.debug('Target move: %s,%s', path[1].x, path[1].y)
 
                 # Turn path into a move we can pass back
+                snake_location = snake.coords[0]
                 return compute_relative_move(path[1], snake_location)
         else:
             return u"none"
