@@ -82,7 +82,9 @@ def is_too_risky_nearby(board_state, snake):
     # Determine if it's too risky
     node = grid[head.x][head.y]
     log.debug(' LOCAL RISKINESS: %.1f', node.riskiness)
-    return (node.riskiness > 4.2)
+#    return (node.riskiness > 4.2)
+# XXX: Just consider it to be too risky at all times.
+    return True
 
 def get_to_safety(board_state, snake):
     safest_path = get_safest_path(board_state, snake)
