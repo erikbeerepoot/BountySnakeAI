@@ -353,3 +353,17 @@ def taunt_opponent(board_state,fatality=False):
 	log.debug("Taunting: %s", final_taunt_string)
 	return final_taunt_string
 
+def get_snakes_that_just_died(snakes,previous_snakes):
+	'''
+	Returns any snakes that died in the last turn
+	'''
+	dead_snakes = filter(lambda snake : snake.status != "alive",snakes)
+	previous_dead_snakes = filter(lambda snake : snake.status != "alive",previous_snakes)
+
+	log.debug(dead_snakes)
+	log.debug(previous_dead_snakes)
+
+	previous_dead_snakes_set = set(previous_dead_snakes)
+	new_dead_snakes = [ snake for snake in dead_snakes if snake not in previous_dead_snakes_set] 
+	return new_dead_snakes
+	
