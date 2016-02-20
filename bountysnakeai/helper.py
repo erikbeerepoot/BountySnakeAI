@@ -1,13 +1,6 @@
 from bountysnakeai import a_star
 from bountysnakeai import log
 
-# Prefer lookups over a conditional
-move_lut = [
-    [u'invalid (0,0)', u'west', u'invalid (0,2)'],
-    [u'north', u'invalid (1,1)', u'south'],
-    [u'invalid (2,0)', u'east', u'invalid (2,2)']
-]
-
 def getSnake(board_state, snake_id):
     for snake in board_state.snake_list:
         if snake.id == snake_id:
@@ -146,10 +139,29 @@ def get_next_move_to_centre(board_state, snake):
         return compute_relative_move(target, snake_location)
 
 def compute_relative_move(move, snake_location):
-        # Compute the difference (offset by one)
-        delta_x = (move.x - snake_location[0]) + 1
-        delta_y = (move.y - snake_location[1]) + 1
-        return move_lut[delta_x][delta_y]
+    """
+    For two contiguous squares, is the destination north, south, east, or west
+    of the snake location?
+
+    Remember that moving towards the x-axis is 'up'!
+    """
+    delta_x = move.x - snake_location.x
+    delta_y = move.y - snake_location.y
+
+    # Ensure we're moving exactly one square north, south, east, or west
+    assert abs(delta_x) + abs(delta_y) == 1
+
+    if delta_x == 1:
+        direction = 'east'
+    elif delta_x == -1:
+        direction = 'west'
+    elif delta_y == 1:
+        direction = 'south'
+    elif delta_y == -1:
+        direction = 'north'
+
+    log.debug("Moving %s from %s to %s", direction, snake_location, move)
+    return direction
 
 def snake_at_corner(board_state, our_snake) :
     head = our_snake.coords[0]
