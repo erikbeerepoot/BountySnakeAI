@@ -41,7 +41,7 @@ def get_next_move_to_food(board_state, snake):
 
             # Turn path into a move we can pass back
             snake_location = snake.coords[0]
-            return compute_relative_move(target, snake_location)
+            return compute_relative_move(snake_location, target)
         else:
             raise Exception('needed a path to food and found none!')
 
@@ -78,7 +78,7 @@ def get_next_move_to_corner(board_state, snake):
         snake_location = snake.coords[0]
         path = path_to_optimal_corner(board_state, snake)
         target = path[1].point
-        return compute_relative_move(target, snake_location)
+        return compute_relative_move(snake_location, target)
 
 def path_to_optimal_corner(board_state, snake):
         '''
@@ -139,9 +139,9 @@ def get_next_move_to_centre(board_state, snake):
         snake_location = snake.coords[0]
         path_to_centre = path_to_centre(board_state, snake)
         target = path_to_centre[1].point
-        return compute_relative_move(target, snake_location)
+        return compute_relative_move(snake_location, target)
 
-def compute_relative_move(target, snake_location):
+def compute_relative_move(snake_location, target):
     """
     For two contiguous squares, is the destination north, south, east, or west
     of the snake location?
