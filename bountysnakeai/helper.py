@@ -22,16 +22,19 @@ def get_corners(board_state):
         a_star.Node(board_state.height-1, 0), # bottom right
     ]
 
-def health_threshold(board_state, snake):
-    """
-    Return the 'threshold' of health below which our snake should go find food.
-    """
-    # XXX: This is a very naive heuristic.
+def should_hunt_for_food(board_state, snake):
     path, cost = plan_path_to_food(board_state, snake)
     log.debug(path)
     log.debug(cost)
-
-    return cost
+    if cost == a_star.INFINITY:
+        # there is no food!
+        return False
+    elif snake.health < cost:
+        # If our snake is going to die by the time it gets there, move to
+        # the nearest food
+        return True
+    else:
+        return False
 
 def get_next_move_to_food(board_state, snake):
         '''

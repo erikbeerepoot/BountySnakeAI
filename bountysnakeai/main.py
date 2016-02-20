@@ -111,7 +111,7 @@ def move():
     if not our_snake:
         bottle.abort(400, u"Bad Request: my snake is missing!")
 
-    if our_snake.health < helper.health_threshold(board_state, our_snake):
+    if helper.should_hunt_for_food(board_state, our_snake):
         #Compute our move relative to the current position 
         private_state['phase'] = 'food'
         move = helper.get_next_move_to_food(board_state, our_snake)
