@@ -8,8 +8,8 @@ import sys
 from bountysnakeai import helper
 from bountysnakeai import model
 from bountysnakeai import log
+from bountysnakeai import snakeID
 
-snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = [u"We're winning"]
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 db = redis.from_url(redis_url)
