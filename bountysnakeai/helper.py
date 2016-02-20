@@ -1,6 +1,7 @@
 import math
 
 from bountysnakeai import a_star
+from bountysnakeai import model
 from bountysnakeai import log
 
 def getSnake(board_state, snake_id):
@@ -168,6 +169,18 @@ def compute_relative_move(snake_location, target):
     log.debug("Moving %s from %s to %s", direction, snake_location, target)
     return direction
 
+def compute_relative_point(snake_location, direction):
+    if direction == 'north':
+        return model.Point(snake_location.x, snake_location.y-1)
+    elif direction == 'east':
+        return model.Point(snake_location.x+1, snake_location.y)
+    elif direction == 'south':
+        return model.Point(snake_location.x, snake_location.y+1)
+    elif direction == 'west':
+        return model.Point(snake_location.x-1, snake_location.y)
+    else:
+        raise ValueError('Unrecognized direction')
+
 def snake_at_corner(board_state, our_snake) :
     head = our_snake.coords[0]
     position = a_star.Node.from_point(head)
@@ -189,55 +202,43 @@ def circle(board_state, our_snake, previous_move):
     snake_length = len(our_snake.coords)
     # Round up to nearest multiple of 4
     snake_length = snake_length + ((4 - (snake_length % 4)) % 4)
-    # Find a quarter of that length
     quarter = snake_length//4
+    # Look at the head-quarter of the snake:
+    head_point = our_snake.coords[0]
+    front_points = our_snake.coords[:quarter]
 
-    grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
+    grid = a_star.build_grid(board_state.width, board_state.height, board_state.snake_list, board_state.food_list)
 
-    #Check if quarters worth of snake is going in the same direction. If not, continue if allowed
-    if (previous_move == 'north' or previous_move == 'south'):
-        for coord in our_snake.coords[:quarter]:
-            if (our_snake.coords[0][0] != coord[0] and move_allowed(previous_move, grid, our_snake.coords[0])):
-                #continue in same direction if allowed
-                return previous_move
+    next_clockwise = {
+        'north': 'east',
+        'east': 'south',
+        'south': 'west',
+        'west': 'north',
+        'None': 'west', # if there is no previous move, try to head west
+    }
+
+    if (previous_move in ['north', 'south'] and not all(point.x == head_point.x for point in front_points)) \
+    or (previous_move in ['east', 'west']   and not all(point.y == head_point.y for point in front_points)):
+        # If the front quarter of the snake isn't all going in the same
+        # direction then continue, if possible, in the previous direction
+        preferred_direction = previous_move
     else:
-        for coord in our_snake.coords[:quarter]:
-            if (our_snake.coords[0][1] != coord[1] and move_allowed(previous_move, grid, our_snake.coords[0])):
-                #continue in same direction if allowed
-                return previous_move
+        # Otherwise, we'd like to turn clockwise.
+        preferred_direction = next_clockwise[previous_move]
 
-    #3rd. We need to turn. Choose direction that doesn't suck
-    return choose_move(previous_move, our_snake.coords[0][0], grid)
+    path = []
+    start_node = a_star.Node.from_point(head_point)
 
-def move_allowed(direction, grid, head):
-    try :
-        if (direction == 'north'):
-            return grid[head[0], head[1] - 1].contents != SNAKE
-        elif (direction == 'south'):
-            return grid[head[0], head[1] + 1].contents != SNAKE
-        elif (direction == 'west'):
-            return grid[head[0] - 1, head[1]].contents != SNAKE
+    for i in xrange(4):
+        goal_point = compute_relative_point(head_point, preferred_direction)
+        goal_node = a_star.Node.from_point(goal_point)
+        path = a_star.find_path(grid, start_node, goal_node)
+
+        if path:
+            return compute_relative_move(path[0].point, path[1].point)
         else:
-            return grid[head[0] + 1, head[1]].contents != SNAKE
-    except:
-        # out of bounds, move would hit a wall
-        return False
+            # If we didn't find a path forward, try turning clockwise again...
+            preferred_direction = next_clockwise[preferred_direction]
 
-def choose_move(move, head, grid):
-    #TODO: recover from one of these bad scenarios. Need to make our approach lend itself to a large enough clockwise circle
-    if (move == 'north'):
-        if (move_allowed('east', grid, head)):
-            return 'east'
-        return 'west' #can't circle. Hail mary to the only place we can go
-    elif (move == 'east'):
-        if (move_allowed('south', grid, head)):
-            return 'south'
-        return 'north' #can't circle. Hail mary to the only place we can go
-    elif (move == 'south'):
-        if (move_allowed('west', grid, head)):
-            return 'west'
-        return 'east' #can't circle. Hail mary to the only place we can go
     else:
-        if (move_allowed('north', grid, head)) :
-            return 'north'
-        return 'south' #can't circle. Hail mary to the only place we can go
+        raise AssertionError('Failed to find a point to move to after turning clockwise four times!')
