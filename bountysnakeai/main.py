@@ -166,7 +166,10 @@ def move():
 	taunt = helper.taunt_opponent(newly_dead_snakes,fatality=True)
 	private_state['taunt'] = taunt
 	
-	
+    log.info('Snake lists:')
+    log.info(previous_snakes)
+    log.info(board_state.snake_list)
+
     previous_snakes = copy.deepcopy(board_state.snake_list)
     private_state['move'] = move
     private_state['phase'] = phase
