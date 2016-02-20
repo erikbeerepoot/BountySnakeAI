@@ -21,7 +21,7 @@ def should_hunt_for_food(board_state, snake):
     if cost == a_star.INFINITY:
         # there is no food!
         return False
-    elif snake.health < (cost*3):
+    elif snake.health < 80:
         # If our snake is going to die by the time it gets there, move to
         # the nearest food
         return True
