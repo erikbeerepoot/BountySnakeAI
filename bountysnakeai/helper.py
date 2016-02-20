@@ -92,7 +92,7 @@ def path_to_optimal_corner(board_state, snake):
         '''
         # 0. Set up  target locations
         head = snake.coords[0]
-        start_location = Node(head.x, head.y)
+        start_location = a_star.Node(head.x, head.y)
         corners = get_corners(board_state)
 
         # 0b. Build grid
