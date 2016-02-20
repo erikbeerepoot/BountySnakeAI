@@ -1,3 +1,5 @@
+import math
+
 from bountysnakeai import a_star
 from bountysnakeai import log
 
@@ -184,7 +186,11 @@ def corner_threshold(cost, snake):
 
 def circle(board_state, our_snake, previous_move):
 
-    quarter = len(our_snake.coords)//4
+    snake_length = len(our_snake.coords)
+    # Round up to nearest multiple of 4
+    snake_length = snake_length + ((4 - (snake_length % 4)) % 4)
+    # Find a quarter of that length
+    quarter = snake_length//4
 
     grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
 
