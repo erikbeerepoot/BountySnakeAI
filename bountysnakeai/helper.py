@@ -14,12 +14,16 @@ def getSnake(board_state, snake_id):
             return snake
     return None
 
-def health_threshold(board_state):
+def health_threshold(board_state, snake):
     """
     Return the 'threshold' of health below which our snake should go find food.
     """
     # XXX: This is a very naive heuristic.
-    return (board_state.width * board_state.height) // 4
+    path, cost = plan_path_to_food(board_state, snake)
+    log.debug(path)
+    log.debug(cost)
+
+    return cost
 
 def get_next_move_to_food(board_state, snake):
         '''
@@ -28,29 +32,47 @@ def get_next_move_to_food(board_state, snake):
         if len(board_state.food_list) < 1:
            return u"none"
 
-        snake_location = snake.coords[0]
-        food_location = board_state.food_list[0]
+        path, cost = plan_path_to_food(board_state, snake)
+        if len(path) > 0:
+                log.debug('Target move: %s,%s', path[1].x, path[1].y)
 
-        start_node = a_star.Node(snake_location.x, snake_location.y)
-        goalNode = a_star.Node(food_location.y, food_location.y)
+                # Turn path into a move we can pass back
+                return compute_relative_move(path[1], snake_location)
+        else:
+                return u'none'
 
-        # Create the grid
+def plan_path_to_food(board_state, snake):
+        if len(board_state.food_list) < 1:
+           return ([], -1)
+
+        # Create the grid for a*
         grid = a_star.build_grid(board_state.width, board_state.height, [], board_state.food_list)
 
-        # Plan our path
-        path = a_star.find_path(grid, start_node, goalNode)
-        log.debug('Current location: %s,%s', start_node.x, start_node.y)
-        log.debug('Food location: %s,%s', food_location.x, food_location.y)
-        log.debug('Target move: %s,%s', path[1].x, path[1].y)
+        start_node = a_star.Node(snake.coords[0].x, snake.coords[0].y)
 
-        # Turn path into a move we can pass back
-        return compute_relative_move(path[1], snake_location)
+        # Plan a path to each of the food locations
+        goals = [a_star.Node(goal.x, goal.y) for goal in board_state.food_list]
+        paths_to_food = [
+                a_star.find_path(grid, start_node, goal)
+                for goals in goals
+        ]
+
+        path_costs = [
+                path[-1].G if path else a_star.INFINITY
+                for path in paths_to_food
+        ]
+
+        # Find the minimum cost path
+        paths_plus_costs = zip(paths_to_food, path_costs)
+        paths_plus_costs.sort(key=lambda t: t[1])
+        return paths_plus_costs[0]
 
 def get_next_move_to_corner(board_state, snake):
         '''
         Gets the next move to the corner, output in a useful format ('north','east', etc)
         '''
-        path = path_to_optimal_corner(board_state ,snake)
+        snake_location = snake.coords[0]
+        path = path_to_optimal_corner(board_state, snake)
         return compute_relative_move(path[1], snake_location)
 
 def path_to_optimal_corner(board_state, snake):
