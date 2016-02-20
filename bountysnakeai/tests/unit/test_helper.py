@@ -11,7 +11,7 @@ class TestHelper(TestCase):
 	json_dict = json.loads(example_json.dummy_game)
         bs = model.BoardState(json_dict)
 
-	taunt = helper.taunt_opponent(bs)
+	taunt = helper.taunt_opponent(bs.snake_list)
 	assert(len(taunt)>0)
 
     def test_dead_snakes_tester(self):
