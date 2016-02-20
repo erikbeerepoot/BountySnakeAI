@@ -40,20 +40,17 @@ def get_next_move_to_food(board_state, snake):
         '''
         Return the next best move to the food
         '''
-        if len(board_state.food_list) < 1:
-           return u"none"
-
         path, cost = plan_path_to_food(board_state, snake)
-        if len(path) > 0:
+        if path:
                 log.debug('Target move: %s,%s', path[1].x, path[1].y)
 
                 # Turn path into a move we can pass back
                 return compute_relative_move(path[1], snake_location)
         else:
-                return u'none'
+            return u"none"
 
 def plan_path_to_food(board_state, snake):
-        if len(board_state.food_list) < 1:
+        if not board_state.food_list:
            return ([], -1)
 
         # Create the grid for a*
