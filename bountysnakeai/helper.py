@@ -1,4 +1,5 @@
 from bountysnakeai import a_star
+from bountysnakeai import log
 
 # Prefer lookups over a conditional
 move_lut = [

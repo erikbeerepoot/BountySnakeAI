@@ -7,16 +7,7 @@ import sys
 
 from bountysnakeai import helper
 from bountysnakeai import model
-
-log = logging.getLogger(__name__)
-log_level = logging.DEBUG
-log.setLevel(log_level)
-stdout_handler = logging.StreamHandler(sys.stdout)
-stdout_handler.setLevel(log_level)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-stdout_handler.setFormatter(formatter)
-log.addHandler(stdout_handler)
-
+from bountysnakeai import log
 
 snakeID = '0b303c04-7182-47f8-b47a-5aa2d2a57d5a'
 taunts = [u"We're winning"]
