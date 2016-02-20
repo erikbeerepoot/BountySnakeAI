@@ -120,7 +120,7 @@ def path_to_centre(board_state, snake):
 
         # We're planning a path between our current location and the centre
         start_location = a_star.Node.from_point(snake.coords[0])
-        centre = a_star.Node(round(board_state.width), round(board_state.height))
+        centre = a_star.Node(board_state.width//2, board_state.height//2)
 
         # Create the grid to plan on
         grid = a_star.build_grid(board_state.width, board_state.height, [], [])
