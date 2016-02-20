@@ -62,7 +62,7 @@ def plan_path_to_food(board_state, snake):
         goals = [a_star.Node(goal.x, goal.y) for goal in board_state.food_list]
         paths_to_food = [
                 a_star.find_path(grid, start_node, goal)
-                for goals in goals
+                for goal in goals
         ]
 
         path_costs = [
