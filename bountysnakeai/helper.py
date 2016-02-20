@@ -397,18 +397,15 @@ def get_snakes_that_just_died(snakes,previous_snakes):
 	if len(snakes) < 1 or len(previous_snakes) < 1:
 		return []
 
-	log.debug("snakes:")
-	log.debug(snakes)
-	log.debug(previous_snakes)
+	if len(snakes) == len(previous_snakes):
+		return []
+	else:
+		#Dead snake will just disappear from the snake list
+		current_snakes = set(snakes)
+		new_dead_snakes = [ snake for snake in previous_snakes if snake not in current_snakes] 
 
-	dead_snakes = filter(lambda snake : snake.status != "alive",snakes)
-	previous_dead_snakes = filter(lambda snake : snake.status != "alive",previous_snakes)
+		for dead_snake in new_dead_snakes:
+			log.debug("Found new dead snake: %s", dead_snake.name)
 
-	previous_dead_snakes_set = set(previous_dead_snakes)
-	new_dead_snakes = [ snake for snake in dead_snakes if snake not in previous_dead_snakes_set] 
-
-	for dead_snake in new_dead_snakes:
-		log.debug("Found new dead snake: %s", dead_snake.name)
-
-	return new_dead_snakes
+		return new_dead_snakes
 	
