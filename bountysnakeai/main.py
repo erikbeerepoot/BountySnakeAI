@@ -125,11 +125,12 @@ def move():
         phase = 'hiding'
         move = helper.get_next_move_to_corner(board_state, our_snake)
 
+    log.info(' GAME: %s', game_id)
+    log.info('PHASE: %s', phase)
+    log.info(' MOVE: %s', move)
     private_state['move'] = move
     private_state['phase'] = phase
     db.hmset(game_id, private_state)
-
-    print("Move: " + move )
 
     return {
         u'move': move,
