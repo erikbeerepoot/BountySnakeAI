@@ -93,10 +93,6 @@ class TestGame(ControllerTestCase):
         response = app.post_json('/move', json_dict, status='*')
         self.assertEqual(response.status, '200 OK')
         json_body = json.loads(response.body)
-        self.assertEqual(json_body, {
-            u'move': 'north',
-            u'taunt': u'We\'re winning',
-        })
 
     def test_end_success(self):
         app = TestApp(main.application)

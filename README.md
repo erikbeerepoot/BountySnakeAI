@@ -47,5 +47,7 @@ This snake automatically deploys to heroku from master, and for each pull reques
 The snake has three phases, and are managed in our redis db.
 
 1) hiding - the snake is attempting to hide in on of the corners
+
 2) circle - the snake is currently circling in one of the board corners
+
 3) food - the snake is currently getting food
