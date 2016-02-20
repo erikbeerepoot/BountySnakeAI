@@ -74,9 +74,9 @@ def start():
     # at game start, default to hide phase
     game_id = board_state.game
     private_state = {
-        'phase': 'hide',
         'move': None,
         'taunt': helper.taunt_opponent(snakes_not_us),
+        'phases': 'none',
     }
 
     db.hmset(game_id, private_state)
@@ -122,8 +122,8 @@ def move():
     if not our_snake:
         bottle.abort(400, u"Bad Request: my snake is missing!")
 
-    previous_phase = private_state['phase']
     previous_move = private_state['move']
+    previous_phases = private_state['phases'].split(',')[-10:]
 
     if helper.should_hunt_for_food(board_state, our_snake):
         # Any stage can lead to hunting if you get hungry enough.
@@ -135,8 +135,33 @@ def move():
         move = helper.get_to_safety(board_state, our_snake)
     else:
         # When it's not too risky and we're not too hungry, lets circle it up
-        phase = 'circle'
-        move = helper.circle(board_state, our_snake, previous_move)
+        last_phase = previous_phases[-1]
+        recent_circles = sum(1 for p in previous_phases[-10:] if p == 'circle')
+        recent_hides = sum(1 for p in previous_phases[-10:] if p == 'hiding-in-corner')
+
+        # continue doing what we were just doing, unless ...
+        if last_phase not in ('circle', 'hiding-in-corner'):
+            phase = 'circle'
+        else:
+            phase = last_phase
+
+        if last_phase == 'circle' and recent_circles > 5:
+            # if we have been circling for 5 moves recently, run to a corner
+            phase = 'hiding-in-corner'
+        elif last_phase == 'hiding-in-corner' and recent_hides > 8:
+            # if we have been hiding for 8 moves recently, start circling again
+            phase = 'circle'
+
+        if phase == 'hiding-in-corner':
+            move = helper.get_next_move_to_corner(board_state, our_snake)
+        elif phase == 'circle':
+            move = helper.circle(board_state, our_snake, previous_move)
+        else:
+            raise Exception('unknown phase ' + phase)
+
+    log.debug(private_state)
+    phases = previous_phases + [phase]
+    private_state['phases'] = ','.join(phases)
 
     log.info(' GAME: %s', game_id)
     log.info('PHASE: %s', phase)
@@ -158,7 +183,6 @@ def move():
 
     previous_snakes = copy.deepcopy(board_state.snake_list)
     private_state['move'] = move
-    private_state['phase'] = phase
     db.hmset(game_id, private_state)
 
     return {
