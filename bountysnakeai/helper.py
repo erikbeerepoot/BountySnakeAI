@@ -48,7 +48,7 @@ def get_next_move_to_food(board_state, snake):
             snake_location = snake.coords[0]
             return compute_relative_move(target, snake_location)
         else:
-            return u"none"
+            raise Exception('needed a path to food and found none!')
 
 def plan_path_to_food(board_state, snake):
         if not board_state.food_list:
