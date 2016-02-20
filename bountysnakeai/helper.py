@@ -4,6 +4,7 @@ import random
 
 from bountysnakeai import a_star
 from bountysnakeai import model
+from random import randint 
 
 log = logging.getLogger(__name__)
 
@@ -285,3 +286,45 @@ def circle(board_state, our_snake, previous_move):
 
     else:
         raise AssertionError('Failed to find a point to move to after turning clockwise four times!')
+
+def taunt_opponent(board_state,fatality=False):
+	'''
+	Selects one of the other snakes on the board and taunts it
+	'''
+	taunts = [
+		' is about to get creamed by this snake',
+		' looks drunk',
+		' is clearly built out of crayon code',
+		' needs a little help from his friends',
+		'! resistance is futile. You will be assimilated (into Workday's coorporate hierarchy)',
+		', Dave Duffield is shaking his head at you right now',
+		' doesn't look like it needs any help dying',
+		' needs less leaf fru-fru, and more performance',
+		', food is for weak snakes',
+		' is on hunger strike'
+	]
+
+       fatal_taunts = [
+		' can't stop killing itself',
+		', the walls are not for eating',
+		' really needs to try harder',
+		', winners don't use drugs'
+	]
+
+	#Get all snakes that aren't us
+	enemy_snakes = filter(lambda snake : snake.id != snakeID, board_state.snakes)
+	if len(enemy_snakes) < 1:
+		return ""
+	#Randomly pick one
+	snake = enemy_snakes[randint(0,len(enemy_snakes)-1)]
+
+	#Randomly pick an appropriate taunt
+	if fatality:
+		taunt = fatal_taunts[randint(0,len(fatal_taunts)-1)
+	else:
+		taunt = taunts[randint(0,len(taunts-1))]
+	
+	final_taunt_string = str(snake.name) + taunt 
+	log.debug("Taunting: %s", final_taunt_string)
+	return final_taunt_string
+
