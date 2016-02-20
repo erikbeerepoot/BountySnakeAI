@@ -73,6 +73,7 @@ def plan_path_to_food(board_state, snake):
         # Find the minimum cost path
         paths_plus_costs = zip(paths_to_food, path_costs)
         paths_plus_costs.sort(key=lambda t: t[1])
+        log.debug("Food paths: %r", paths_plus_costs)
         return paths_plus_costs[0]
 
 def get_next_move_to_corner(board_state, snake):
