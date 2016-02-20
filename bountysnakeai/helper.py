@@ -191,13 +191,13 @@ def circle(board_state, our_snake, move):
 def move_allowed(direction, grid, head):
     try :
         if (direction == 'north'):
-            return grid[head[0], head[1] - 1].contents != 1 #snake
+            return grid[head[0], head[1] - 1].contents != SNAKE
         elif (direction == 'south'):
-            return grid[head[0], head[1] + 1].contents != 1 #snake
+            return grid[head[0], head[1] + 1].contents != SNAKE
         elif (direction == 'west'):
-            return grid[head[0] - 1, head[1]].contents != 1 #snake
+            return grid[head[0] - 1, head[1]].contents != SNAKE
         else:
-            return grid[head[0] + 1, head[1]].contents != 1 #snake
+            return grid[head[0] + 1, head[1]].contents != SNAKE
     except:
         # out of bounds, move would hit a wall
         return False
