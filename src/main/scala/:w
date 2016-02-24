@@ -1,0 +1,10 @@
+import scala.collection.mutable.PriorityQueue
+import scala.math.ordering.Implicits._
+
+case class Node(x : Int, y : Int) {
+}
+
+
+class AStar(grid : Array[Array[Int]]){
+    var openSet i= PriorityQueue[(Int,Node)](implicit ordering : Ordering[(Int,Node)]
+} 
