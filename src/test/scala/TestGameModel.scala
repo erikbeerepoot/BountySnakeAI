@@ -44,7 +44,7 @@ class GameModelSpec extends FlatSpec {
 
     it should "allow adding valid points to the board" in {
       val game = JSONObjectFactory.createObject[Game](json)
-      val board = Grid(game.width,game.height)
+      val board = Grid[GridValue](game.width,game.height)
       game.snakes foreach { snake => board.addPoints(snake.coords,Enemy) }
       assert(board.values(1)(2) == Enemy)
       assert(board.values(2)(2) == Enemy)
@@ -52,7 +52,7 @@ class GameModelSpec extends FlatSpec {
 
     it should "allow setting the entire grid to a certain value" in {
       val game = JSONObjectFactory.createObject[Game](json)
-      val grid = Grid(game.width,game.height)
+      val grid = Grid[GridValue](game.width,game.height)
       grid.setGridToValue(Enemy)
       assert(grid.values(0)(0) == Enemy)
     }
