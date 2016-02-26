@@ -50,6 +50,7 @@ case class Grid[A : ClassTag](val width : Int, val height : Int){
           print(f"${number}%5.1f")
         }
       }
+      case null =>  print("*****,")
     }
     }; println;
    }

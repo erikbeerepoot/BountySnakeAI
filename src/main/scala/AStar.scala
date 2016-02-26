@@ -34,7 +34,14 @@ class AStar(var grid : Grid[Double]){
         while(!openSet.isEmpty){
           val current = openSet.dequeue()
           if(current.point == goal){
+            println(" ------------- g_score ----------------")
             g_score.printGrid()
+            println(" --------------------------------------")
+            
+            println(" ------------- origin ----------------")
+            originGrid.printGrid()
+            println(" --------------------------------------")
+           
             return reconstructPath(originGrid,start,goal)
           }
 
