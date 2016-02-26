@@ -70,10 +70,17 @@ class AStar(var grid : Grid[Double]){
         return List[Point]()
     }
 
+    //Reconstruct path traces the path back from the goal node to the origin to find the best path
     def reconstructPath(originGrid : Grid[Point] , start : Point, goal : Point) : List[Point] = {
       var path = ListBuffer[Point]()
+
+      //Trace ancestors back from goal -> start
       var currentPoint = goal
       while(currentPoint != start){
+        //If we encounter null at any point -> no path exists
+        if(originGrid(currentPoint) == null){
+          return List[Point]()
+        }
         path += currentPoint
         currentPoint = originGrid(currentPoint)
       }
@@ -89,12 +96,10 @@ class AStar(var grid : Grid[Double]){
 
     def estimateCost(start : Point, goal : Point) : Double = {
        return manhattanDistance(start,goal) 
-       //return euclidianDistance(start,goal)
     }
 
     def euclidianDistance(pointA : Point, pointB : Point) : Double = {
        return math.sqrt(math.abs(pointA.y - pointB.y)^2 + math.abs(pointA.x - pointB.x)^2)
-      
     }
     
     def manhattanDistance(pointA : Point, pointB : Point) : Int = math.abs(pointA.x - pointB.x) + math.abs(pointA.y - pointB.y)
