@@ -87,13 +87,6 @@ class AStar(var grid : Grid[Double]){
       }
     }
 
-    def estimateCost(start : Node, goal : Node) : Double = {
-       return manhattanDistance(start,goal) 
-       val pointA = start.point
-       val pointB = goal.point
-       return euclidianDistance(pointA,pointB)
-    }
-
     def estimateCost(start : Point, goal : Point) : Double = {
        return manhattanDistance(start,goal) 
        //return euclidianDistance(start,goal)
@@ -103,8 +96,6 @@ class AStar(var grid : Grid[Double]){
        return math.sqrt(math.abs(pointA.y - pointB.y)^2 + math.abs(pointA.x - pointB.x)^2)
       
     }
-
-    def manhattanDistance(nodeA : Node, nodeB : Node) : Int = math.abs(nodeA.point.x - nodeB.point.x) + math.abs(nodeA.point.y - nodeB.point.y)
     
     def manhattanDistance(pointA : Point, pointB : Point) : Int = math.abs(pointA.x - pointB.x) + math.abs(pointA.y - pointB.y)
 
