@@ -51,7 +51,7 @@ class AStar(var grid : Grid[Double]){
           //for each neighbour of current
           neighboursForNode(current) foreach { neighbour =>
             if(!pointInQueue(neighbour,closedSet)){
-              val tentativeScore = g_score(current.point) + euclidianDistance(current.point,neighbour)
+              val tentativeScore = g_score(current.point) + grid(neighbour) + euclidianDistance(current.point,neighbour)
               
               //We've discovered a more efficient path 
               if(!pointInQueue(neighbour,openSet)){
