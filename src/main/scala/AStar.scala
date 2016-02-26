@@ -13,7 +13,7 @@ class AStar(var grid : Grid[Double]){
     var closedSet = PriorityQueue[Node]()
     var openSet = PriorityQueue[Node]()
 
-    //Add obstacles, etc. to the grid
+    //Add obstacles, etc. to the grid (each in one list)
     def buildGrid(snakes : List[Snake], food : List[Point], walls : List[Point], gold : List[Point]){
       snakes foreach { snake => grid.addPoints(snake.coords,Enemy.cost)}
       grid.addPoints(food,Food.cost)
@@ -21,6 +21,7 @@ class AStar(var grid : Grid[Double]){
       grid.addPoints(gold,Gold.cost)
     } 
 
+    //Attempts to plan a path from the start -> goal
     def planPath(start : Point, goal : Point) : List[Point] = {
         var closedSet = PriorityQueue[Node]()
         var openSet = PriorityQueue[Node](Node(start,0))
