@@ -43,8 +43,14 @@ case class Grid[A : ClassTag](val width : Int, val height : Int){
     values foreach { row => row foreach { value => value match {
       case value : GridValue => System.out.printf("%4d",value) 
       case point : Point => print(f"(${point.x},${point.y}),")  
-      case _ => 
+      case number : Double => { 
+        if(number == Double.MaxValue){
+          printf("%5s","\u221e")
+        } else {
+          print(f"${number}%5.1f")
+        }
       }
+    }
     }; println;
    }
   }
