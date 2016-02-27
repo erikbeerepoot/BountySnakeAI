@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visualization</title>
+    <script type="text/javascript" src="../js/Draw.js" ></script>
+
+</head>
+<body>
+
+<canvas id="canvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+
+
+var canvas = document.getElementById("canvas")
+var boundingBox = new Rect(0,0,canvas.width,canvas.height)
+
+console.log("asdf")
+drawGridInRect(boundingBox,canvas,20,20)
+getBoard()
+
+function getBoard(endpoint){
+    if(!endpoint){
+        endpoint = "/"
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "http://127.0.0.1:8080" + endpoint, false);
+    xhr.send();
+
+    console.log(xhr.status);
+    console.log(xhr.statusText);
+}
+
+
+</script> 
+
+	
+	
+</body>
+</html>
