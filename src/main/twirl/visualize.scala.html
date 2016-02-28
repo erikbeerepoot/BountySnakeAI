@@ -6,12 +6,19 @@
     <title>Visualization</title>
     <link rel="stylesheet" type="text/css" href="../../css/visualize.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700' rel='stylesheet' type='text/css'>
-    <script type="text/javascript" src="../../js/Draw.js" ></script>
+    <script type="text/javascript" src="../../js/GameController.js" ></script>
+    <script type="text/javascript" src="../../js/DrawPath.js" ></script>
 </head>
 <body>
 
-<h1 class="title">Game: @name</h1> 
-<svg class="game_board" width="@{numCols*cellWidth}" height="@{numRows*cellHeight}">
+    <h1 class="title">Game: @name</h1> 
+    <ul class="nav">
+        <li class="btn_start" id="btn_start"><a href="javascript:;">start</a></li>
+        <li class="btn_move" id="btn_move"><a href="javascript:;">move</a></li>
+        <li class="btn_reset" id="btn_reset"><a href="javascript:;">reset</a></li>
+    </ul>
+
+<svg id="game_board" class="game_board" width="@{numCols*cellWidth}" height="@{numRows*cellHeight}">
     @* Create board *@
     @for(row <- Range(0,numRows)){
         <g class="row">
@@ -45,5 +52,8 @@
 
 </svg>
 </body>
+<script>
+    var gameController = new GameController()
+</script>
 </html>
 
