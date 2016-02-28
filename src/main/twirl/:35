@@ -1,0 +1,44 @@
+@import com.barefoot.bountysnake._
+@(numRows : Int, numCols : Int, cellWidth : Int, cellHeight : Int,snakes : List[Snake], food : List[Point], gold : List[Point], walls : List[Point])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visualization</title>
+    <link rel="stylesheet" type="text/css" href="../../css/visualize.css">
+    <script type="text/javascript" src="../../js/Draw.js" ></script>
+</head>
+<body>
+
+<svg width="@{numCols*cellWidth}" height="@{numRows*cellHeight}">
+//Create board
+    @for(row <- Range(0,numRows)){
+        <g class="row">
+        @for(col <- Range(0,numCols)){
+            <rect class="cell" x="@{col*cellWidth}" y="@{row*cellHeight}" width="@cellWidth" height="@cellHeight"/>
+        }
+        </g>
+    }
+    //Draw snakes
+    @for(snake <- snakes){
+        @for(point <- snake.coords){
+            <g class="snake">
+            <rect class="snake_@{snake.id}_body" x="@{point.x}" y="@{point.y}" height="@cellHeight" width="@cellWidth"/>
+            </g>
+        }
+    }
+    //Draw food
+    @for(f <- food){
+        <rect class="food" x="@f.x" y="@f.y" height="@cellHeight" width="@celLWidth"/>
+    }
+
+    @for(g <- gold){
+        <rect class="gold" x="@g.x" y="@g.y" height="@cellHeight" width="@celLWidth"/>
+        }
+    @for(w <- walls){
+        <rect class="wall" x="@w.x" y="@w.y" height="@cellHeight" width="@cellWidth"/>
+    }
+
+</svg>
+</body>
+</html>
+
