@@ -1,0 +1,11 @@
+{
+    "game" : "tasty-nutsacks",
+    "width" : 20,
+    "height" : 20,
+    "snakes" : [],
+    "gold" : [],
+    "walls" : [],
+    "food" : [],
+    "turn" : 0,
+    "mode" : "basic"
+}

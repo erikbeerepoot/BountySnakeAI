@@ -21,5 +21,5 @@ lazy val root = (project in file(".")).
         "io.spray"            %%  "spray-json"    % "1.3.2"
       )
     }
-  )
+  ).enablePlugins(SbtTwirl)
   Revolver.settings
