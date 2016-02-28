@@ -7,6 +7,8 @@ import MediaTypes._
 import spray.http.{ HttpHeaders, HttpOrigin, SomeOrigins }
 import spray.routing.Directive0
 import spray.routing.Directives._
+import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
+import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -65,7 +67,8 @@ trait MyService extends HttpService {
     }
   }
 
-  val route =
+  val route = {
+    import GameJsonProtocol._
     //Most basic route to verify server is up
     path("") {
       get {
@@ -75,20 +78,47 @@ trait MyService extends HttpService {
       }
     } ~
     //Endpoint used to get the game state for a given game
-    path("state" / Segment ){ gameId => 
-      val game = GameController.lookupGameByName(gameId)
-      complete(StatusCodes.OK,"Return game")
+    pathPrefix("game" ){ 
+      pathEnd {
+        complete(StatusCodes.OK,s"Specify a game id using the next path component")
+      } ~
+      pathPrefix(Segment) { gameId => 
+        val game = GameController.lookupGameByName(gameId)
+        pathEnd {
+          if(game.isEmpty){          
+            complete(StatusCodes.OK,s"No game with name $gameId found")
+          } else {
+            complete(StatusCodes.OK,"Game found")
+          }
+        } ~ 
+        path("state"){
+          if(!game.isEmpty) {
+            complete {
+              game
+            }
+          } else {
+            complete(StatusCodes.OK,s"No game with name $gameId found")
+          }
+        }
+      } 
     } ~
     //Endpoint used to create a new game
     path("start") {
+        post {
+          entity(as[Game]) { game =>
+            GameController.addGame(game)
+            complete(StatusCodes.OK,s"Started game with name $game.game")
+          }
+        }
     } ~
     //Endpoint used to visualize games
     path("visualize"){
       getFromFile("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/html/board.html")
     } ~
-    //Service the JS as well
+    //Serve the JS as well
     pathPrefix("js"){
         print("serve js")
         getFromDirectory("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/js/")
     }
+  }
 }
