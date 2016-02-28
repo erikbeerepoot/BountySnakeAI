@@ -1,3 +1,4 @@
+package com.barefoot.bountysnake
 import scala.reflect.ClassTag
 
 sealed class GridValue(val cost : Double = 0, val name : String = ""){

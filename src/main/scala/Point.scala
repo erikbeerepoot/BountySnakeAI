@@ -1,3 +1,5 @@
+package com.barefoot.bountysnake
+
 case class Point(x : Int,y : Int){
   def this(list : List[Int]) = {
     this(list(0),list(1))

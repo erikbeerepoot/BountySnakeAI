@@ -1,3 +1,5 @@
+package com.barefoot.bountysnake
+
 import scala.collection.mutable.PriorityQueue
 import scala.collection.mutable.ListBuffer
 import scala.math.Ordering.Implicits._

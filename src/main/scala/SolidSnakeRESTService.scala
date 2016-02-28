@@ -1,4 +1,4 @@
-package com.example
+package com.barefoot.bountysnake
 
 import akka.actor.Actor
 import spray.routing._
@@ -66,6 +66,7 @@ trait MyService extends HttpService {
   }
 
   val route =
+    //Most basic route to verify server is up
     path("") {
       get {
         allowHosts(Set[String]("http://127.0.0.1:8080")) {
@@ -73,9 +74,19 @@ trait MyService extends HttpService {
         }
       }
     } ~
+    //Endpoint used to get the game state for a given game
+    path("state" / Segment ){ gameId => 
+      val game = GameController.lookupGameByName(gameId)
+      complete(StatusCodes.OK,"Return game")
+    } ~
+    //Endpoint used to create a new game
+    path("start") {
+    } ~
+    //Endpoint used to visualize games
     path("visualize"){
       getFromFile("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/html/board.html")
     } ~
+    //Service the JS as well
     pathPrefix("js"){
         print("serve js")
         getFromDirectory("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/js/")
