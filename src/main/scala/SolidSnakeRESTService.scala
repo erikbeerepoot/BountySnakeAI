@@ -69,6 +69,8 @@ trait MyService extends HttpService {
 
   val route = {
     import GameJsonProtocol._
+    import PointJsonProtocol._
+    
     //Most basic route to verify server is up
     path("") {
       get {
@@ -82,31 +84,55 @@ trait MyService extends HttpService {
       pathEnd {
         complete(StatusCodes.OK,s"Specify a game id using the next path component")
       } ~
+      //Looks up the game by name 
       pathPrefix(Segment) { gameId => 
         val game = GameController.lookupGameByName(gameId)
         pathEnd {
-          if(game.isEmpty){          
-            complete(StatusCodes.OK,s"No game with name $gameId found")
-          } else {
-            complete(StatusCodes.OK,"Game found")
+          game match {
+            case None => complete(StatusCodes.OK,s"No game with name $gameId found")
+            case Some(_) => complete(StatusCodes.OK,"Game found")
           }
         } ~ 
-        path("state"){
-          if(!game.isEmpty) {
-            complete {
-              game
+        path("move"){
+            post {
+              entity(as[Game]) { game =>
+              GameController.snakeControllerForGame(game.game) match {
+              case Some(snakeController) => {
+                snakeController.updateState(game)
+                complete(StatusCodes.OK,"Updated game state")
+              }
+              case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
+              }
             }
-          } else {
-            complete(StatusCodes.OK,s"No game with name $gameId found")
+           }
+        } ~ 
+        //returns the current state of the game
+        path("state"){
+          game match {
+            case None => complete(StatusCodes.OK,s"No game with name $gameId found")
+            case Some(game) => complete { game.game }
           }
-        }
-      } 
+        } ~
+        //Returns the current path of the snake
+        path("path"){
+          GameController.snakeControllerForGame(gameId) match {
+            case Some(snakeController) => {
+                if(snakeController.path.isEmpty){
+                  complete(StatusCodes.OK,"No path found")
+                } else {
+                  complete { snakeController.path.head } 
+                }
+            }
+            case None => complete(StatusCodes.OK,"No path found")
+          }
+        }  
+      }  
     } ~
     //Endpoint used to create a new game
     path("start") {
         post {
           entity(as[Game]) { game =>
-            GameController.addGame(game)
+            GameController.createGame(game)
             complete(StatusCodes.OK,s"Started game with name $game.game")
           }
         }
