@@ -128,7 +128,21 @@ trait MyService extends HttpService {
             }
             case None => complete(StatusCodes.OK,"No path found")
           }
-        }  
+        } ~
+        //Endpoint used to visualize games
+        path("visualize"){
+          game match {
+            case None => complete(StatusCodes.OK,s"No game with name $gameId found")
+            case Some(game) => {
+              respondWithMediaType(`text/html`) {
+                complete {
+                  val currentGame = game.game
+                  html.visualize(currentGame.width,currentGame.height,30,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
+                }
+              }
+            }
+          } 
+        } 
       }  
     } ~
     //Endpoint used to create a new game
@@ -140,14 +154,14 @@ trait MyService extends HttpService {
           }
         }
     } ~
-    //Endpoint used to visualize games
-    path("visualize"){
-      getFromFile("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/html/board.html")
-    } ~
+    //Serve static content
     //Serve the JS as well
     pathPrefix("js"){
-        print("serve js")
         getFromDirectory("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/js/")
+    } ~
+    //Serve the JS as well
+    pathPrefix("css"){
+        getFromDirectory("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/css/")
     }
   }
 }
