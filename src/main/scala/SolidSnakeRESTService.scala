@@ -7,8 +7,10 @@ import MediaTypes._
 import spray.http.{ HttpHeaders, HttpOrigin, SomeOrigins }
 import spray.routing.Directive0
 import spray.routing.Directives._
+import spray.httpx.marshalling.Marshaller
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
+import spray.httpx.marshalling.ToResponseMarshallable
 
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
@@ -69,7 +71,6 @@ trait MyService extends HttpService {
 
   val route = {
     import GameJsonProtocol._
-    import PointJsonProtocol._
     
     //Most basic route to verify server is up
     path("") {
@@ -115,12 +116,14 @@ trait MyService extends HttpService {
         } ~
         //Returns the current path of the snake
         path("path"){
+          import PointJsonProtocol._
           GameController.snakeControllerForGame(gameId) match {
             case Some(snakeController) => {
                 if(snakeController.path.isEmpty){
                   complete(StatusCodes.OK,"No path found")
                 } else {
-                  complete { snakeController.path.head } 
+                  print(snakeController.path)
+                  complete { snakeController.path } 
                 }
             }
             case None => complete(StatusCodes.OK,"No path found")
