@@ -8,6 +8,39 @@ html, body {
     font-weight: 400;
     color : #ecf0f1;
 }
+
+ul .nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    display:inline;
+    width : 60px;
+    padding: 5px 10px; 
+    margin: 0px 5px;
+}
+
+li a {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 20px;
+    color : #ecf0f1;
+    text-decoration: none;
+}
+
+.btn_start {
+    background-color : #27ae60;
+}
+
+.btn_reset {
+    background-color : #c0392b;
+}
+
+.btn_move {
+    background-color : #f1c40f;
+}
+
 .game_board {
     fill : grey;
     fill-opacity : 0.5;
@@ -20,10 +53,14 @@ html, body {
 }
 
 .snake {
-    fill : #ff0000;
+    fill : #8e44ad;
     fill-opacity : 0.75;
 }
 
+.path {
+    fill : #3498db;
+    fill-opacity : 0.5;
+}
 .gold {
     fill : #f1c40f;
     fill-opacity : 0.9;
