@@ -1,0 +1,36 @@
+html, body {
+    text-align : center;
+    background-color: #2c3e50;
+}
+
+
+.game_board {
+    fill : grey;
+    fill-opacity : 0.5;
+}
+
+.cell {
+    fill : white;
+    stroke-width: 1px;
+    stroke : grey;
+}
+
+.snake {
+    fill : #ff0000;
+    fill-opacity : 0.75;
+}
+
+.gold {
+    fill : #f1c40f;
+    fill-opacity : 0.9;
+}
+
+.walls { 
+    fill : #191500;
+    fill-opacity : 0.7;
+}
+
+.food { 
+    fill : #1abc9c;
+    fill-opacity: 1.0;
+}
