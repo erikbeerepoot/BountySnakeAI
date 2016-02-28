@@ -10,7 +10,7 @@
 <body>
 
 <svg class="game_board" width="@{numCols*cellWidth}" height="@{numRows*cellHeight}">
-//Create board
+    @* Create board *@
     @for(row <- Range(0,numRows)){
         <g class="row">
         @for(col <- Range(0,numCols)){
@@ -18,7 +18,7 @@
         }
         </g>
     }
-    //Draw snakes
+    @* Draw snakes *@
     @for(snake <- snakes){
         @for(point <- snake.coords){
             <g class="snake">
@@ -26,17 +26,17 @@
             </g>
         }
     }
-    //Draw food
+    @* Draw food *@
     @for(f <- food){
     <circle class="food" cx="@{f.x*cellWidth + 0.5*cellWidth}" cy="@{f.y*cellHeight + 0.5*cellHeight}" r="@{0.5*cellHeight}"/>
     }
 
-    //Draw gold
+    @* Draw gold *@
     @for(g <- gold){
     <rect class="gold" x="@{g.x*cellWidth}" y="@{g.y*cellHeight}" height="@cellHeight" width="@cellWidth"/>
     }
 
-    //Draw walls
+    @*Draw walls *@
     @for(w <- walls){
     <rect class="wall" x="@{w.x*cellWidth}" y="@{w.y*cellHeight}" height="@cellHeight" width="@cellWidth"/>
     }
