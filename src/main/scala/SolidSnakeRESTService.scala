@@ -137,7 +137,7 @@ trait MyService extends HttpService {
               respondWithMediaType(`text/html`) {
                 complete {
                   val currentGame = game.game
-                  html.visualize(currentGame.width,currentGame.height,30,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
+                  html.visualize(currentGame.game,currentGame.width,currentGame.height,30,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
                 }
               }
             }

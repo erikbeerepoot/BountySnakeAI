@@ -1,14 +1,16 @@
 @import com.barefoot.bountysnake._
-@(numRows : Int, numCols : Int, cellWidth : Int, cellHeight : Int,snakes : List[Snake], food : List[Point], gold : List[Point], walls : List[Point])
+@(name : String, numRows : Int, numCols : Int, cellWidth : Int, cellHeight : Int,snakes : List[Snake], food : List[Point], gold : List[Point], walls : List[Point])
 <!DOCTYPE html>
 <html>
 <head>
     <title>Visualization</title>
     <link rel="stylesheet" type="text/css" href="../../css/visualize.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700' rel='stylesheet' type='text/css'>
     <script type="text/javascript" src="../../js/Draw.js" ></script>
 </head>
 <body>
 
+<h1 class="title">Game: @name</h1> 
 <svg class="game_board" width="@{numCols*cellWidth}" height="@{numRows*cellHeight}">
     @* Create board *@
     @for(row <- Range(0,numRows)){
