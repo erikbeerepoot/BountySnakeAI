@@ -18,10 +18,11 @@ case class SnakeController(var gameState : Game){
       println("Couldn't find our snake :( can't run a*"); //TODO: Throw exception
       return 
     }
-    currentPosition = ourSnake.head.coords.head
 
     val headPosition = ourSnake.head.coords.headOption match {
       case Some(head) => {
+        currentPosition = head
+
         //Create a new planner and board
         val enemies = gameState.snakes.filter(snake=>snake.id != snakeId)
         var planner : AStar = new AStar(costGrid)
@@ -44,8 +45,9 @@ case class SnakeController(var gameState : Game){
     }
 
     //just look at the path differences
-    val deltaX = currentPosition.x - path.head.x
-    val deltaY = currentPosition.x - path.head.y
+    val deltaX = path.last.x - currentPosition.x
+    val deltaY = path.last.y - currentPosition.y
+    println(s"delta: $deltaX, $deltaY")
     if(deltaX==1){
       return "east"
     } else if (deltaX == -1){
