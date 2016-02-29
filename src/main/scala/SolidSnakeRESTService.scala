@@ -95,11 +95,19 @@ trait MyService extends HttpService {
           }
         } ~ 
         path("move"){
+          import spray.json._
+
             post {
               entity(as[Game]) { game =>
               GameController.snakeControllerForGame(game.game) match {
               case Some(snakeController) => {
                 snakeController.updateState(game)
+                val nextMove = snakeController.getNextMove()               
+                respondWithMediaType(`application/json`) {
+                  complete {
+                    JsObject("move" -> JsString(nextMove))
+                  }
+                }
               }
               case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
               }
