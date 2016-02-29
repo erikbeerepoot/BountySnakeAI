@@ -9,19 +9,32 @@ class GameController {
 
         this.gameState =
         {
-         "game" : "tasty-nutsacks",
-          "width" : 20,
-          "height" : 20,
-          "snakes" : [],
-          "gold" : [{"x" : 2, "y" : 2}],
-          "walls" : [],
-          "food" : [{"x" : 5, "y" : 10}],
-          "turn" : 0,
-          "mode" : "basic"
-        };
+            "game" : "tasty-nutsacks",
+            "width" : 20,
+            "height" : 20,
+            "snakes" : [{
+                "name" : "ballface",
+                "id" : "1234-567890-123456-7890",
+                "status": "alive",
+                "message": "Moved north",
+                "taunt": "Let's rock!",
+                "age": 56,
+                "health": 83,
+                "coords": [ {"x" : 1, "y" : 0}, {"x" : 0, "y" : 0} ],
+                "kills": 4,
+                "food": 12,
+                "gold": 2
+                }],
+            "gold" : [{"x" : 2, "y" : 2}],
+            "walls" : [],
+            "food" : [{"x" : 5, "y" : 10}],
+            "turn" : 0,
+            "mode" : "basic"
+        }
         var gameboard = document.getElementById("game_board")
-        this.pathDrawer = new BoxyPathDrawer(0,0,20,20,30,30,gameboard)
-    
+        this.pathDrawer = new BoxyDrawer(0,0,20,20,30,30,gameboard)
+        this.snakeDrawer = new BoxyDrawer(0,0,20,20,30,30,gameboard)
+        this.snakeDrawer.updatePath(this.gameState.snakes[0].coords,"snake")
     }
 
     handler_btn_start(){
@@ -39,7 +52,7 @@ class GameController {
         //request path
         get('path').then(function(response) {
             var path = JSON.parse(response)
-            me.pathDrawer.updatePath(path)
+            me.pathDrawer.updatePath(path,"path")
         }, function(error) {
             console.error("Failed!", error);
         });
