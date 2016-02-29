@@ -100,7 +100,6 @@ trait MyService extends HttpService {
               GameController.snakeControllerForGame(game.game) match {
               case Some(snakeController) => {
                 snakeController.updateState(game)
-                complete(StatusCodes.OK,"Updated game state")
               }
               case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
               }
@@ -137,7 +136,7 @@ trait MyService extends HttpService {
               respondWithMediaType(`text/html`) {
                 complete {
                   val currentGame = game.game
-                  html.visualize(currentGame.game,currentGame.width,currentGame.height,30,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
+                  html.visualize(currentGame.game,currentGame.width,currentGame.height,31,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
                 }
               }
             }
