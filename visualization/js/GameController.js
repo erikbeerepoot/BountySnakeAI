@@ -19,6 +19,8 @@ class GameController {
           "turn" : 0,
           "mode" : "basic"
         };
+        var gameboard = document.getElementById("game_board")
+        this.pathDrawer = new BoxyPathDrawer(0,0,20,20,30,30,gameboard)
     
     }
 
@@ -27,6 +29,7 @@ class GameController {
 
     handler_btn_move(){
         //invoke move 
+        var me = this
         post('move',this.gameState).then(function(response) {
             console.log("Success!", response);
         }, function(error) {
@@ -36,25 +39,10 @@ class GameController {
         //request path
         get('path').then(function(response) {
             var path = JSON.parse(response)
-            var gameboard = document.getElementById("game_board")
-
-            var width = 30
-            var height = 30
-            for(var coord in path){
-                var element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                element.setAttribute('x',path[coord].x * width)
-                element.setAttribute('y',path[coord].y * height)
-                element.setAttribute('width',width)
-                element.setAttribute('height',height)
-                element.setAttribute('class','path')
-                gameboard.appendChild(element)
-            }
-
+            me.pathDrawer.updatePath(path)
         }, function(error) {
             console.error("Failed!", error);
         });
-
-
     }
 
     handler_btn_reset(){
@@ -101,7 +89,6 @@ function post(url,data) {
     req.open('POST', url,true);
 
     req.setRequestHeader("Content-Type","application/json");
-    req.send(JSON.stringify(data))
 
     req.onload = function() {
       // This is called even on 404 etc
@@ -124,7 +111,7 @@ function post(url,data) {
     };
 
     // Make the request
-    req.send();
+    req.send(JSON.stringify(data));
   });
 }
 
