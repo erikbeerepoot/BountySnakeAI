@@ -1,6 +1,6 @@
 "use strict";
 
-class BoxyPathDrawer {
+class BoxyDrawer {
     //parameters define bounding box + gridsize
     constructor(x,y,width,height,gridWidth,gridHeight,parentElement){
         this.x = x
@@ -13,9 +13,9 @@ class BoxyPathDrawer {
         this.parentElement = parentElement 
     }
     
-    updatePath(path){
+    updatePath(path,classType){
         this.erasePath()
-        this.drawPath(path)
+        this.drawPath(path,classType)
     }
 
     erasePath(){
@@ -25,17 +25,18 @@ class BoxyPathDrawer {
         this.pathElements = []
     }
 
-    drawPath(path){
+    drawPath(path,classType){
         for(var coord in path){
             var element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
             element.setAttribute('x',this.x + path[coord].x * this.gridWidth)
             element.setAttribute('y',this.y + path[coord].y * this.gridHeight)
             element.setAttribute('width',this.gridWidth)
             element.setAttribute('height',this.gridHeight)
-            element.setAttribute('class','path')
+            element.setAttribute('class',classType)
             this.pathElements.push(element)
             this.parentElement.appendChild(element)
         }
     }
 }
+
 
