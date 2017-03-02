@@ -11,12 +11,22 @@ case class Node(val point : Point, val priority : Double = 0) extends Ordered[No
 }
 
 class AStar(var grid : Grid[Double]){
-
     var closedSet = PriorityQueue[Node]()
     var openSet = PriorityQueue[Node]()
 
+    var ourSnakeBody : List[Point] = List.empty
+    var otherSnakes : List[Snake] = List.empty
+
     //Add obstacles, etc. to the grid (each in one list)
-    def buildGrid(snakes : List[Snake], food : List[Point], walls : List[Point], gold : List[Point]){
+    def buildGrid(ourSnake : Snake, snakes : List[Snake], food : List[Point], walls : List[Point], gold : List[Point]){
+      ourSnakeBody = ourSnake.coords
+      
+      //Clear grid first
+      grid.setGridToValue(0.0)
+      
+      //Now set up our board
+      grid.addPoints(ourSnake.coords,Infinity.cost)
+      println(s"Found ${snakes.length} snakes")
       snakes foreach { snake => grid.addPoints(snake.coords,Enemy.cost)}
       grid.addPoints(food,Food.cost)
       grid.addPoints(walls,Wall.cost)
@@ -39,14 +49,11 @@ class AStar(var grid : Grid[Double]){
         while(!openSet.isEmpty){
           val current = openSet.dequeue()
           if(current.point == goal){
-            println(" ------------- g_score ----------------")
-            g_score.printGrid()
-            println(" --------------------------------------")
-            
-            println(" ------------- origin ----------------")
-            originGrid.printGrid()
-            println(" --------------------------------------")
-           
+            println("-=-=-=-=-=-=-=-=-=-")
+            println("-=-= G Score: -=-=-")
+            println("-=-=-=-=-=-=-=-=-=-")
+            g_score.printGrid(ourSnakeBody)
+            println("-=-=-=-=-=-=-=-=-=-")
             return reconstructPath(originGrid,start,goal)
           }
 
@@ -64,6 +71,7 @@ class AStar(var grid : Grid[Double]){
                 val priority = tentativeScore + estimateCost(neighbour,goal)
                 openSet.enqueue(Node(neighbour,priority))
               }
+
               if(tentativeScore < g_score(neighbour)){
                 g_score(neighbour) = tentativeScore
                 f_score(neighbour) = g_score(neighbour) + estimateCost(neighbour,goal)
@@ -118,19 +126,84 @@ class AStar(var grid : Grid[Double]){
       val y = node.point.y
 
       //get neighbouring nodes (if they exist)
-      var neighbours = ListBuffer[Point]()
-      if(x>=1){
-        neighbours += Point((x-1),y)
-      }
-      if(y>=1){
-        neighbours += Point(x,y-1)
-      }
-      if(x+1<grid.width){
-        neighbours += Point(x+1,y)
-      }
-      if(y+1<grid.height){
-        neighbours += Point(x,y+1)
-      }
+      var neighbours = unfilteredNeighboursForNode(node)
+      
+      //Filter out any nodes that are part of the snakes body      
+      neighbours = neighbours.filter(neighbour => !ourSnakeBody.contains(neighbour))      
+      
+      //Also avoid other snakes
+      otherSnakes.foreach(enemy => {
+        neighbours = neighbours.filter(neighbour => !enemy.coords.contains(neighbour))      
+      })
+      //Filter out nodes that are inside of a loop we make with our body
+      //detectLoop()
+
       neighbours.toList
+    }
+
+    def unfilteredNeighboursForNode(node : Node) : List[Point] = {
+        neighboursForPoint(node.point)
+    }
+
+    def neighboursForPoint(point : Point) : List[Point] = {
+        val x = point.x
+        val y = point.y 
+
+        var neighbours = ListBuffer[Point]()
+        if(x>=1){
+          neighbours += Point((x-1),y)
+        }
+        if(y>=1){
+          neighbours += Point(x,y-1)
+        }
+        if(x+1<grid.width){
+          neighbours += Point(x+1,y)
+        }
+        if(y+1<grid.height){
+          neighbours += Point(x,y+1)
+        }
+        neighbours.toList
+    }
+
+    def detectLoop() : List[Point] = {
+      for(index <- 0 to (ourSnakeBody.length - 1)){
+        val currentElement = ourSnakeBody(index)
+        
+        //Get the list of neighbours
+        var neighbours = neighboursForPoint(currentElement).to[ListBuffer]
+
+        //Remove the next element of our body (if exists)
+        if(index + 1 < ourSnakeBody.length){
+          val nextElement = ourSnakeBody(index+1)
+          neighbours -= nextElement          
+        }
+
+        //Remove the prev element of our body (if exists)
+        if(index > 0){
+          val prevElement = ourSnakeBody(index-1)          
+          neighbours -= prevElement
+        }
+
+        //dirty hack
+        if(index > 1){
+         val prevElement = ourSnakeBody(index-2)          
+          neighbours -= prevElement 
+        }
+
+        var hasLoop = false
+        neighbours.foreach(neighbour => {
+          if(ourSnakeBody.contains(neighbour)){
+            hasLoop = true
+          }
+        })
+
+        if(hasLoop){
+          //go back and find loop
+          // println("Has loop")
+        }
+
+      }
+
+      List.empty
     }
 } 

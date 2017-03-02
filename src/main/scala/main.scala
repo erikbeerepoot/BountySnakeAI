@@ -3,11 +3,11 @@ package com.barefoot.bountysnake
 import net.liftweb.json._
 
 
-object SolidSnake{
-  def main(args: Array[String]): Unit = {
-    println("Hello, world!")
-  }
-}
+// object SolidSnake{
+//   def main(args: Array[String]): Unit = {
+//     println("Hello, world!")
+//   }
+// }
 
 object JSONObjectFactory {
   implicit val formats = DefaultFormats

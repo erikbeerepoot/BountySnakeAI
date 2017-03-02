@@ -38,8 +38,7 @@ trait MyService extends HttpService {
     */
   def allowHosts(allowedHostnames: Set[String]): Directive0 = mapInnerRoute { innerRoute =>
     // Conditionally responds with "allowed" CORS headers, if the request origin's host is in the
-    // allowed set, or if the request doesn't have an origin.
-    println("allowHosts asdf asdf")
+    // allowed set, or if the request doesn't have an origin.    
     optionalHeaderValueByType[HttpHeaders.Origin]() { originOption =>
       println(s"originOption: $originOption")
       // If Origin is set and the host is in our allowed set, add CORS headers and pass through.
@@ -48,6 +47,7 @@ trait MyService extends HttpService {
           case HttpOrigin(_, HttpHeaders.Host(hostname, _)) => {
             println(s"origin: $list")
             allowedHostnames.contains(hostname)
+            true
           }
         }
       } map { goodOrigin =>
@@ -74,46 +74,58 @@ trait MyService extends HttpService {
     
     //Most basic route to verify server is up
     path("") {
-      get {
-        allowHosts(Set[String]("http://127.0.0.1:8080")) {
-          complete(StatusCodes.OK,"Complete")
-        }
+      get {        
+          complete(StatusCodes.OK,"Complete")        
       }
     } ~
     //Endpoint used to get the game state for a given game
+    path("move"){
+          import spray.json._
+
+            post {              
+              entity(as[Game]) { game =>
+              println(s"Game : ${game.game_id}")              
+
+              if(GameController.lookupGameById(game.game_id) == None){
+                println("Could not find game. Creating...")                
+                GameController.createGame(game)                          
+              }
+              
+              GameController.snakeControllerForGame(game.game_id) match {
+                case Some(snakeController) => {
+                  snakeController.updateState(game)                  
+                  if(snakeController.hasNextMove() == false){                                    
+                    println("No valid move left :( FUCK")
+                  }
+                
+                  val nextMove = snakeController.getNextMove()  
+                  println(s"Next move: $nextMove")
+
+                  respondWithMediaType(`application/json`) {
+                    complete {
+                      JsObject("move" -> JsString(nextMove),"taunt" -> JsString("suck mah balls"))
+                    }
+                  }
+                }
+                case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
+              }
+            
+            }
+           }
+    } ~
     pathPrefix("game" ){ 
       pathEnd {
         complete(StatusCodes.OK,s"Specify a game id using the next path component")
       } ~
       //Looks up the game by name 
       pathPrefix(Segment) { gameId => 
-        val game = GameController.lookupGameByName(gameId)
+        val game = GameController.lookupGameById(gameId)
         pathEnd {
           game match {
             case None => complete(StatusCodes.OK,s"No game with name $gameId found")
             case Some(_) => complete(StatusCodes.OK,"Game found")
           }
-        } ~ 
-        path("move"){
-          import spray.json._
-
-            post {
-              entity(as[Game]) { game =>
-              GameController.snakeControllerForGame(game.game) match {
-              case Some(snakeController) => {
-                snakeController.updateState(game)
-                val nextMove = snakeController.getNextMove()               
-                respondWithMediaType(`application/json`) {
-                  complete {
-                    JsObject("move" -> JsString(nextMove))
-                  }
-                }
-              }
-              case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
-              }
-            }
-           }
-        } ~ 
+        } ~         
         //returns the current state of the game
         path("state"){
           game match {
@@ -135,40 +147,48 @@ trait MyService extends HttpService {
             }
             case None => complete(StatusCodes.OK,"No path found")
           }
-        } ~
-        //Endpoint used to visualize games
-        path("visualize"){
-          game match {
-            case None => complete(StatusCodes.OK,s"No game with name $gameId found")
-            case Some(game) => {
-              respondWithMediaType(`text/html`) {
-                complete {
-                  val currentGame = game.game
-                  html.visualize(currentGame.game,currentGame.width,currentGame.height,31,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
-                }
-              }
-            }
-          } 
-        } 
+        } //~
+        // //Endpoint used to visualize games
+        // path("visualize"){
+        //   game match {
+        //     case None => complete(StatusCodes.OK,s"No game with name $gameId found")
+        //     case Some(game) => {
+        //       respondWithMediaType(`text/html`) {
+        //         complete {
+        //           val currentGame = game.game
+        //           html.visualize(currentGame.game,currentGame.width,currentGame.height,31,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
+        //         }
+        //       }
+        //     }
+        //   } 
+        // } 
       }  
     } ~
     //Endpoint used to create a new game
     path("start") {
+        import StartJsonProtocol._
+        import spray.json._
         post {
-          entity(as[Game]) { game =>
-            GameController.createGame(game)
-            complete(StatusCodes.OK,s"Started game with name $game.game")
+          entity(as[StartObject]) { game =>
+            println(s"Started game with $game.game")
+            GameController.createGame(game)            
+            complete {
+                JsObject("name" -> JsString("ScalaSnake"),"color" -> JsString("blue"),"head_url" -> JsString("http://placecage.com/c/100/100"))
+            }
           }
-        }
+        }        
     } ~
     //Serve static content
     //Serve the JS as well
     pathPrefix("js"){
-        getFromDirectory("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/js/")
+        getFromDirectory("/Users/erik.beerepoot/Code/BountySnakeAI/visualization/js/")
+    } ~
+    pathPrefix("static"){
+        getFromDirectory("/Users/erik.beerepoot/Code/BountySnakeAI/static/")
     } ~
     //Serve the JS as well
     pathPrefix("css"){
-        getFromDirectory("/Users/erik/Dropbox/Projects/Programming/Scala/BountySnakeAI/visualization/css/")
+        getFromDirectory("/Users/erik.beerepoot/Code/BountySnakeAI/css/")
     }
   }
 }

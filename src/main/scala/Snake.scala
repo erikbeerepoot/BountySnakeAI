@@ -5,10 +5,10 @@ import spray.json._
 import DefaultJsonProtocol._
 import PointJsonProtocol._
 
-case class Snake(val name : String,val id : String,val coords : List[Point],val status : String, val message : String, val taunt : String, val age : Int, val health : Int, val kills : Int, val food : Int, val gold : Int)
+case class Snake(val name : String,val id : String,val coords : List[Point], val taunt : String, val health_points : Int)
 
 object SnakeJsonProtocol extends DefaultJsonProtocol {
-  implicit val snakeFormat = jsonFormat11(Snake)
+  implicit val snakeFormat = jsonFormat5(Snake)
 }
 
 object SnakeFactory {
@@ -18,4 +18,5 @@ object SnakeFactory {
     return parse(json).extract[Snake]
   }
 }
+
 
