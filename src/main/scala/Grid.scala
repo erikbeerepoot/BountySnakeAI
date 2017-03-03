@@ -32,7 +32,7 @@ case class Grid[A : ClassTag](val width : Int, val height : Int){
         //Print snake in grid
         if(snake.contains(Point(x,y))){                    
             if(Point(x,y) == snake.head){
-               printf("%5s","\u2639")
+               printf("%5s","\u25B2")
             } else {
               printf("%5s","\u25A0")
             }

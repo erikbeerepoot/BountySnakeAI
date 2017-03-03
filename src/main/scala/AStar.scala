@@ -1,8 +1,10 @@
 package com.barefoot.bountysnake
 
-import scala.collection.mutable.PriorityQueue
+import scala.collection.mutable.{Queue,PriorityQueue}
 import scala.collection.mutable.ListBuffer
 import scala.math.Ordering.Implicits._
+import util.control.Breaks._
+
 
 //Node class is just a point with a priority 
 case class Node(val point : Point, val priority : Double = 0) extends Ordered[Node] {
@@ -10,31 +12,76 @@ case class Node(val point : Point, val priority : Double = 0) extends Ordered[No
   def compare(node : Node) = node.priority.compareTo(this.priority)
 }
 
+object AStar {
+     //Returns the Euclidian distance between two points
+    def euclidianDistance(pointA : Point, pointB : Point) : Double = {
+       return math.sqrt(math.abs(pointA.y - pointB.y)^2 + math.abs(pointA.x - pointB.x)^2)
+    }
+   
+    //Returns the Manhattan distance between two points 
+    def manhattanDistance(pointA : Point, pointB : Point) : Int = math.abs(pointA.x - pointB.x) + math.abs(pointA.y - pointB.y)
+
+}
+
 class AStar(var grid : Grid[Double]){
     var closedSet = PriorityQueue[Node]()
     var openSet = PriorityQueue[Node]()
 
-    var ourSnakeBody : List[Point] = List.empty
-    var otherSnakes : List[Snake] = List.empty
+    //Keep track of the set of snakes
+    var ourSnake : List[Point] = List.empty
+    var enemies : List[Snake] = List.empty
+    var deadEnemies : List[Snake] = List.empty
+
+    //Keep track of any cavities (cached for performance reasons)
+    var cavityPoints = List[Point]()
 
     //Add obstacles, etc. to the grid (each in one list)
-    def buildGrid(ourSnake : Snake, snakes : List[Snake], food : List[Point], walls : List[Point], gold : List[Point]){
-      ourSnakeBody = ourSnake.coords
-      
-      //Clear grid first
+    def buildGrid(ourSnake : Snake, snakes : List[Snake], dead_snakes : List[Snake], food : List[Point], walls : List[Point], gold : List[Point]){
+      //Save the location of all snakes on the board
+      this.ourSnake = ourSnake.coords
+      enemies = snakes
+      deadEnemies = dead_snakes
+
+      //Clear grid first (so we dont keep old snake paths around)
       grid.setGridToValue(0.0)
       
       //Now set up our board
-      grid.addPoints(ourSnake.coords,Infinity.cost)
-      println(s"Found ${snakes.length} snakes")
-      snakes foreach { snake => grid.addPoints(snake.coords,Enemy.cost)}
+      grid.addPoints(ourSnake.coords,Infinity.cost)      
       grid.addPoints(food,Food.cost)
       grid.addPoints(walls,Wall.cost)
       grid.addPoints(gold,Gold.cost)
+
+      //Add enemies to the grid 
+      snakes foreach { 
+        snake => grid.addPoints(snake.coords,Enemy.cost)
+      }
+
+      //Also add dead enemies, as they are still obstacles
+      deadEnemies foreach {
+       snake => grid.addPoints(snake.coords,Enemy.cost) 
+      }
+
+//      println("==-=-=-=-=-=-=-=-=-=-==")
+//      println("==-= Board state: -=-==")
+//      println("==-=-=-=-=-=-=-=-=-=-==")
+//      grid.printGrid(List.empty)
+//      println("==-=-=-=-=-=-=-=-=-=-==")
     } 
+
+    def planPathWithFailedMessage(start : Point, goal : Point, failedMessage : String) : List[Point] = { 
+      val path = planPath(start,goal)
+      if(path.isEmpty){
+        println(s"Path planning failed. Message: $failedMessage")
+      }
+      return path
+    }
 
     //Attempts to plan a path from the start -> goal
     def planPath(start : Point, goal : Point) : List[Point] = {
+        //First,Search for convex sets inside of loops
+        cavityPoints = cavitySearch()
+
+        //Now do A*
         var closedSet = PriorityQueue[Node]()
         var openSet = PriorityQueue[Node](Node(start,0))
         
@@ -49,11 +96,13 @@ class AStar(var grid : Grid[Double]){
         while(!openSet.isEmpty){
           val current = openSet.dequeue()
           if(current.point == goal){
-            println("-=-=-=-=-=-=-=-=-=-")
-            println("-=-= G Score: -=-=-")
-            println("-=-=-=-=-=-=-=-=-=-")
-            g_score.printGrid(ourSnakeBody)
-            println("-=-=-=-=-=-=-=-=-=-")
+//            println("==-=-=-=-=-=-=-=-==")
+//            println("==-= G Score: -=-==")
+//            println("==-=-=-=-=-=-=-=-==")
+//            g_score.printGrid(ourSnake)
+//            println("-=-=-=-=-=-=-=-=-=-")
+
+
             return reconstructPath(originGrid,start,goal)
           }
 
@@ -63,7 +112,7 @@ class AStar(var grid : Grid[Double]){
           //for each neighbour of current
           neighboursForNode(current) foreach { neighbour =>
             if(!pointInQueue(neighbour,closedSet)){
-              val tentativeScore = g_score(current.point) + grid(neighbour) + euclidianDistance(current.point,neighbour)
+              val tentativeScore = g_score(current.point) + grid(neighbour) + AStar.euclidianDistance(current.point,neighbour)
               
               //We've discovered a more efficient path 
               if(!pointInQueue(neighbour,openSet)){
@@ -108,19 +157,13 @@ class AStar(var grid : Grid[Double]){
       }
     }
 
+    //Estimate the cost to a point
     def estimateCost(start : Point, goal : Point) : Double = {
-       return manhattanDistance(start,goal) 
+       return AStar.manhattanDistance(start,goal) 
     }
-
-    //Returns the Euclidian distance between two points
-    def euclidianDistance(pointA : Point, pointB : Point) : Double = {
-       return math.sqrt(math.abs(pointA.y - pointB.y)^2 + math.abs(pointA.x - pointB.x)^2)
-    }
-   
-    //Returns the Manhattan distance between two points 
-    def manhattanDistance(pointA : Point, pointB : Point) : Int = math.abs(pointA.x - pointB.x) + math.abs(pointA.y - pointB.y)
-
-    //Simply return the {N,S,E,W} neighbours 
+ 
+    //Simply return the {N,S,E,W} neighbours, but discard squares we shouldn't move to
+    //These squares could be the locations of enemies, or walls, etc.
     def neighboursForNode(node : Node) : List[Point] = {
       val x = node.point.x
       val y = node.point.y
@@ -129,22 +172,121 @@ class AStar(var grid : Grid[Double]){
       var neighbours = unfilteredNeighboursForNode(node)
       
       //Filter out any nodes that are part of the snakes body      
-      neighbours = neighbours.filter(neighbour => !ourSnakeBody.contains(neighbour))      
+      neighbours = neighbours.filter(neighbour => !ourSnake.contains(neighbour))      
       
-      //Also avoid other snakes
-      otherSnakes.foreach(enemy => {
+      //Also avoid other snakes (live ones)
+      enemies.foreach(enemy => {
         neighbours = neighbours.filter(neighbour => !enemy.coords.contains(neighbour))      
       })
-      //Filter out nodes that are inside of a loop we make with our body
-      //detectLoop()
+
+      //Handle dead snakes separately
+      deadEnemies.foreach(enemy => {
+        neighbours = neighbours.filter(neighbour => !enemy.coords.contains(neighbour))      
+      })
+
+      //Search for convex sets inside of loops
+      if(cavityPoints.nonEmpty) {
+        neighbours.filterNot(n => cavityPoints.contains(n))
+      }
 
       neighbours.toList
     }
 
+  def cavitySearch(): List[Point] = {
+    //Filter out nodes that are inside of a loop we make with our body
+    var cavityPoints = List[Point]()
+    val loops = detectLoops()
+
+    loops.map(loop => {
+      //Find squares between tail and consecutive nodes to see if we can find empty
+      val head = loop.head
+        breakable {
+        loop.foreach(segment => {
+          var xRange: scala.collection.immutable.Range = head.x to segment.x
+          if (segment.x < head.x) {
+            xRange = head.x to segment.x by -1
+          }
+
+          var yRange: scala.collection.immutable.Range = head.y to segment.y
+          if (segment.y < head.y) {
+            yRange = head.y to segment.y by -1
+          }
+
+          //Convert to ListBuffer to equalize length
+          var x = xRange.to[ListBuffer]
+          var y = yRange.to[ListBuffer]
+
+          while (y.length < x.length) {
+            y = y :+ y.last
+          }
+
+          while (x.length < y.length) {
+            x = x :+ x.last
+          }
+
+          //path, as the bird flies, between the two points
+          val points = for ((x, y) <- (x zip y)) yield new Point(x, y)
+
+          //filter out points that are part of the snake's body
+          val nonBodyPoints = points.filter(point => !ourSnake.contains(point))
+
+          if (nonBodyPoints.nonEmpty) {
+            /* Now, we do a greedy expansion from this point. The result should be
+             just the inside of this loop */
+            cavityPoints ++= greedyExpansion(nonBodyPoints.head)
+            break
+          }
+        })
+      }
+    })
+    return cavityPoints.distinct
+  }
+
+    //Do a greedy expansion, finding all neighbours not part of our body
+    def greedyExpansion(fromPoint: Point): List[Point] = {
+      var openSet = Queue[Point]()
+      var closedSet = Queue[Point]()
+      var cavity = ListBuffer[Point]()
+
+      //Don't expand more than the total number of nodes on the grid (heuristic)
+      val maxExpansionNumber = grid.width * grid.height
+
+      var count = 0
+      openSet.enqueue(fromPoint)
+      while(openSet.nonEmpty) {
+        //Get a point we haven't explored yet
+        val point = openSet.dequeue()
+        closedSet.enqueue(point)
+        cavity += point
+
+        //Find all neighbours
+        val neighbours = neighboursForPoint(point)
+
+        //Filter to neighbours not part of our body
+        var freeNeighbours = neighbours.filterNot(neighbour => ourSnake.contains(neighbour))
+
+        //And haven't already been covered
+        freeNeighbours = freeNeighbours.filterNot(f => closedSet.contains(f))
+
+        //The explore them
+        freeNeighbours.foreach(openSet.enqueue(_))
+
+        //If we've exceeded our search treshold, just bail. Something went wrong
+        count += 1
+        if(count > maxExpansionNumber){
+          return cavity.toList.distinct
+        }
+
+      }
+      cavity.toList.distinct
+    }
+
+    //Wrapper to return unfiltered neighbours
     def unfilteredNeighboursForNode(node : Node) : List[Point] = {
         neighboursForPoint(node.point)
     }
 
+    //returns the 4 immediate neighbours of this point
     def neighboursForPoint(point : Point) : List[Point] = {
         val x = point.x
         val y = point.y 
@@ -159,51 +301,71 @@ class AStar(var grid : Grid[Double]){
         if(x+1<grid.width){
           neighbours += Point(x+1,y)
         }
-        if(y+1<grid.height){
+        if(y+1 < grid.height){
           neighbours += Point(x,y+1)
         }
         neighbours.toList
     }
 
-    def detectLoop() : List[Point] = {
-      for(index <- 0 to (ourSnakeBody.length - 1)){
-        val currentElement = ourSnakeBody(index)
-        
-        //Get the list of neighbours
-        var neighbours = neighboursForPoint(currentElement).to[ListBuffer]
+    //Attempts to detect loops that our snake makes with itself, or with the board edges
+    def detectLoops() : List[List[Point]] = {
 
-        //Remove the next element of our body (if exists)
-        if(index + 1 < ourSnakeBody.length){
-          val nextElement = ourSnakeBody(index+1)
-          neighbours -= nextElement          
-        }
-
-        //Remove the prev element of our body (if exists)
-        if(index > 0){
-          val prevElement = ourSnakeBody(index-1)          
-          neighbours -= prevElement
-        }
-
-        //dirty hack
-        if(index > 1){
-         val prevElement = ourSnakeBody(index-2)          
-          neighbours -= prevElement 
-        }
-
-        var hasLoop = false
-        neighbours.foreach(neighbour => {
-          if(ourSnakeBody.contains(neighbour)){
-            hasLoop = true
-          }
-        })
-
-        if(hasLoop){
-          //go back and find loop
-          // println("Has loop")
-        }
-
+      //8 is the smallest length at which we can form a loop that can kill us
+      if(ourSnake.length < 8){
+        return List.empty
       }
 
-      List.empty
+      //Consider segments along with their neighbours
+      var cycles : ListBuffer[List[Point]] = ListBuffer.empty
+      for(startIdx <- 0 to (ourSnake.length-3)){
+        val endIdx = Math.min(startIdx+3,(ourSnake.length))
+
+        //Two adjacent vertices in our snake, and the midpoint 
+        val sublist = ourSnake.slice(startIdx,endIdx).toList
+        if(sublist.isEmpty){
+          return List.empty
+        }
+
+        //Get all neighbours of this midpoint
+        var point = Point(0,0)
+        if(sublist.length == 3){
+          //grab the middle segment
+          point = sublist(1)
+        } else {
+          //just get the end
+          point = sublist.last
+        }
+        val neighbours = neighboursForPoint(point)
+
+        //Get the neighbours that aren't adjent vertices of the snake body
+        val otherNeighbours = neighbours diff sublist
+
+        //If the other neighbours are part of the snake's body, there must be a cycle
+        val commonElements = otherNeighbours.filter(n => ourSnake contains n)
+        if(commonElements.nonEmpty){
+          //Include the body elements from point of contact to the body element that we contacted
+          val fromIdx = ourSnake.indexOf(commonElements.head)
+          val toIdx = ourSnake.indexOf(point)
+          val cycle = ourSnake.slice(fromIdx,toIdx+1).toList
+          if(cycle.nonEmpty) {
+            cycles += cycle
+          }
+        }
+      }
+
+      //filter out non-distinct cycles
+      val distinctCycles = filterCycles(cycles.toList)
+      return distinctCycles.filter(!_.isEmpty)
+    }
+
+    //We may have several distinct cycles, but if they are part of the same cycle
+    //each of the smaller cycles we found will be a subset of the longest cycle
+    def filterCycles(cycles : List[List[Point]]): List[List[Point]] = {
+      //if, for the current cycle, there is an element in cycles that contains it, we discard it
+      cycles.filter(cycle => {
+          !(cycles.exists(e => {
+              (e containsSlice cycle) && (e != cycle)
+          }))
+      })
     }
 } 

@@ -9,7 +9,7 @@ import PointJsonProtocol._
 case class StartObject(val game_id: String, val width : Int, val height : Int){}
 
 //Game class
-case class Game(val you : String, val game_id: String, val width : Int, val height : Int, var snakes : List[Snake],var food : List[Point],var dead_snakes : List[Snake], val turn : Int = 0){
+case class Game(var you : String, val game_id: String, val width : Int, val height : Int, var snakes : List[Snake],var food : List[Point],var dead_snakes : List[Snake], val turn : Int = 0){
 }
 
 object StartJsonProtocol extends DefaultJsonProtocol { 

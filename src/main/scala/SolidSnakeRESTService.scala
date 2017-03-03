@@ -11,7 +11,8 @@ import spray.httpx.marshalling.Marshaller
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
 import spray.httpx.marshalling.ToResponseMarshallable
-
+import spray.json._
+import scala.collection.mutable.ListBuffer
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
 class MyServiceActor extends Actor with MyService {
@@ -40,12 +41,10 @@ trait MyService extends HttpService {
     // Conditionally responds with "allowed" CORS headers, if the request origin's host is in the
     // allowed set, or if the request doesn't have an origin.    
     optionalHeaderValueByType[HttpHeaders.Origin]() { originOption =>
-      println(s"originOption: $originOption")
       // If Origin is set and the host is in our allowed set, add CORS headers and pass through.
       originOption flatMap {
         case HttpHeaders.Origin(list) => list.find {
           case HttpOrigin(_, HttpHeaders.Host(hostname, _)) => {
-            println(s"origin: $list")
             allowedHostnames.contains(hostname)
             true
           }
@@ -79,37 +78,31 @@ trait MyService extends HttpService {
       }
     } ~
     //Endpoint used to get the game state for a given game
-    path("move"){
-          import spray.json._
-
+    path("move"){          
             post {              
-              entity(as[Game]) { game =>
-              println(s"Game : ${game.game_id}")              
-
-              if(GameController.lookupGameById(game.game_id) == None){
-                println("Could not find game. Creating...")                
-                GameController.createGame(game)                          
-              }
-              
-              GameController.snakeControllerForGame(game.game_id) match {
-                case Some(snakeController) => {
-                  snakeController.updateState(game)                  
-                  if(snakeController.hasNextMove() == false){                                    
-                    println("No valid move left :( FUCK")
+                entity(as[Game]) { game =>
+                  if(GameController.lookupGameById(game.game_id) == None){
+                    println("Could not find game. Creating...")                
+                    GameController.createGame(game)                          
                   }
-                
-                  val nextMove = snakeController.getNextMove()  
-                  println(s"Next move: $nextMove")
+                  
+                  GameController.snakeControllerForGame(game.game_id) match {
+                    case Some(snakeController) => {                                      
+                      //Update our game state
+                      snakeController.updateState(game)                  
 
-                  respondWithMediaType(`application/json`) {
-                    complete {
-                      JsObject("move" -> JsString(nextMove),"taunt" -> JsString("suck mah balls"))
+                      //Plan the next path
+                      snakeController.planPath()  
+
+                      val nextMove = snakeController.getNextMove()                    
+                      respondWithMediaType(`application/json`) {
+                        complete {
+                          JsObject("move" -> JsString(nextMove),"taunt" -> JsString("suck mah balls"))
+                        }
+                      }
                     }
-                  }
+                    case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
                 }
-                case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
-              }
-            
             }
            }
     } ~
@@ -147,22 +140,8 @@ trait MyService extends HttpService {
             }
             case None => complete(StatusCodes.OK,"No path found")
           }
-        } //~
-        // //Endpoint used to visualize games
-        // path("visualize"){
-        //   game match {
-        //     case None => complete(StatusCodes.OK,s"No game with name $gameId found")
-        //     case Some(game) => {
-        //       respondWithMediaType(`text/html`) {
-        //         complete {
-        //           val currentGame = game.game
-        //           html.visualize(currentGame.game,currentGame.width,currentGame.height,31,30,currentGame.snakes,currentGame.food,currentGame.gold,currentGame.walls).toString
-        //         }
-        //       }
-        //     }
-        //   } 
-        // } 
-      }  
+        }
+      }
     } ~
     //Endpoint used to create a new game
     path("start") {
@@ -173,22 +152,10 @@ trait MyService extends HttpService {
             println(s"Started game with $game.game")
             GameController.createGame(game)            
             complete {
-                JsObject("name" -> JsString("ScalaSnake"),"color" -> JsString("blue"),"head_url" -> JsString("http://placecage.com/c/100/100"))
+                JsObject("name" -> JsString("ScalaSnake"),"color" -> JsString("blue"),"head_url" -> JsString("hhttps://tenor.co/uuXp.gif"),"taunt" -> JsString("DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE"))
             }
           }
         }        
-    } ~
-    //Serve static content
-    //Serve the JS as well
-    pathPrefix("js"){
-        getFromDirectory("/Users/erik.beerepoot/Code/BountySnakeAI/visualization/js/")
-    } ~
-    pathPrefix("static"){
-        getFromDirectory("/Users/erik.beerepoot/Code/BountySnakeAI/static/")
-    } ~
-    //Serve the JS as well
-    pathPrefix("css"){
-        getFromDirectory("/Users/erik.beerepoot/Code/BountySnakeAI/css/")
     }
   }
 }
