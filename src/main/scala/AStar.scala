@@ -61,11 +61,11 @@ class AStar(var grid : Grid[Double]){
        snake => grid.addPoints(snake.coords,Enemy.cost) 
       }
 
-//      println("==-=-=-=-=-=-=-=-=-=-==")
-//      println("==-= Board state: -=-==")
-//      println("==-=-=-=-=-=-=-=-=-=-==")
-//      grid.printGrid(List.empty)
-//      println("==-=-=-=-=-=-=-=-=-=-==")
+      println("==-=-=-=-=-=-=-=-=-=-==")
+      println("==-= Board state: -=-==")
+      println("==-=-=-=-=-=-=-=-=-=-==")
+      grid.printGrid(List.empty)
+      println("==-=-=-=-=-=-=-=-=-=-==")
     } 
 
     def planPathWithFailedMessage(start : Point, goal : Point, failedMessage : String) : List[Point] = { 
@@ -96,11 +96,11 @@ class AStar(var grid : Grid[Double]){
         while(!openSet.isEmpty){
           val current = openSet.dequeue()
           if(current.point == goal){
-//            println("==-=-=-=-=-=-=-=-==")
-//            println("==-= G Score: -=-==")
-//            println("==-=-=-=-=-=-=-=-==")
-//            g_score.printGrid(ourSnake)
-//            println("-=-=-=-=-=-=-=-=-=-")
+            println("==-=-=-=-=-=-=-=-==")
+            println("==-= G Score: -=-==")
+            println("==-=-=-=-=-=-=-=-==")
+            g_score.printGrid(ourSnake)
+            println("-=-=-=-=-=-=-=-=-=-")
 
 
             return reconstructPath(originGrid,start,goal)
@@ -195,7 +195,9 @@ class AStar(var grid : Grid[Double]){
   def cavitySearch(): List[Point] = {
     //Filter out nodes that are inside of a loop we make with our body
     var cavityPoints = List[Point]()
-    val loops = detectLoops()
+
+    val loops = detectLoops(ourSnake)
+
 
     loops.map(loop => {
       //Find squares between tail and consecutive nodes to see if we can find empty
@@ -308,20 +310,20 @@ class AStar(var grid : Grid[Double]){
     }
 
     //Attempts to detect loops that our snake makes with itself, or with the board edges
-    def detectLoops() : List[List[Point]] = {
+    def detectLoops(forBody : List[Point]) : List[List[Point]] = {
 
-      //8 is the smallest length at which we can form a loop that can kill us
-      if(ourSnake.length < 8){
+      //8 is the smallest length at which a snake can form a loop (with ourselves) that can kill us
+      if(forBody .length < 8){
         return List.empty
       }
 
       //Consider segments along with their neighbours
       var cycles : ListBuffer[List[Point]] = ListBuffer.empty
-      for(startIdx <- 0 to (ourSnake.length-3)){
-        val endIdx = Math.min(startIdx+3,(ourSnake.length))
+      for(startIdx <- 0 to (forBody.length-3)){
+        val endIdx = Math.min(startIdx+3,(forBody.length))
 
         //Two adjacent vertices in our snake, and the midpoint 
-        val sublist = ourSnake.slice(startIdx,endIdx).toList
+        val sublist = forBody.slice(startIdx,endIdx).toList
         if(sublist.isEmpty){
           return List.empty
         }
@@ -341,12 +343,12 @@ class AStar(var grid : Grid[Double]){
         val otherNeighbours = neighbours diff sublist
 
         //If the other neighbours are part of the snake's body, there must be a cycle
-        val commonElements = otherNeighbours.filter(n => ourSnake contains n)
+        val commonElements = otherNeighbours.filter(n => forBody contains n)
         if(commonElements.nonEmpty){
           //Include the body elements from point of contact to the body element that we contacted
-          val fromIdx = ourSnake.indexOf(commonElements.head)
-          val toIdx = ourSnake.indexOf(point)
-          val cycle = ourSnake.slice(fromIdx,toIdx+1).toList
+          val fromIdx = forBody.indexOf(commonElements.head)
+          val toIdx = forBody.indexOf(point)
+          val cycle = forBody.slice(fromIdx,toIdx+1).toList
           if(cycle.nonEmpty) {
             cycles += cycle
           }

@@ -66,8 +66,17 @@ case class SnakeController(var gameState : Game){
         }
       } 
 
+
       if(path.isEmpty){
-        println("Was unable to plan any path. Death is imminent!! Attempting last resort squiggle")
+        println("Unable to plan path using the normal methods. Attempting to follow our tail!")
+        val tail = snake.get.coords.last
+        val nbs = planner.neighboursForNode(Node(tail,0))
+
+        path = planner.planPath(head,nbs.head)
+      }
+
+      if(path.isEmpty){
+        println("Was unable to plan any path. Death is imminent!! Attempting last resort squiggle!")
         path = squiggle(planner)
       }
     }
@@ -82,8 +91,12 @@ case class SnakeController(var gameState : Game){
     //Determine the current planning state
     def determineState(planner : AStar) : SnakeState.SnakeState = {
       if(!snake.isDefined){
+        //Doesnt make sense, but returning something is better than nothing
         return SnakeState.Dance
       }
+
+      val canKillOtherSnake = canKill(planner)
+      println(s"canKill: $canKillOtherSnake")
 
       //If we're desperate for food, or we're not very long -> get food
       if(snake.get.health_points < (20 + Math.min(snake.get.coords.length,30)) || snake.get.coords.length < 25){
@@ -102,10 +115,60 @@ case class SnakeController(var gameState : Game){
     //Do a little squiggle if we can't get a* to plan anything further
     def squiggle(planner : AStar) : List[Point] = {
       val nbs = planner.neighboursForNode(Node(snake.get.coords.head,0))  
-      if(nbs.isEmpty==false){    
+      if(nbs.isEmpty==false){
         return planner.planPath(snake.get.coords.head,nbs.head)
       }   
       return List.empty
+    }
+
+    //Can we starve the other snake by getting to the food first?
+    def canKill(planner : AStar) : Boolean = {
+      //If there are more than two snakes on the board, we can't single out a single snake
+      if(gameState.snakes.length != 2){
+        return false
+      }
+
+      //If there's more than 1 food on the board, this algorithm will be pointless
+      if(gameState.food.length > 1){
+        return false
+      }
+
+      //This is safe, since if two snakes -> 1 is an enemy, 1 is us
+      val ourSnake = gameState.snakes.filter(localSnake => localSnake.id == snakeId).head
+      val enemy = gameState.snakes.filterNot(localSnake => localSnake.id == snakeId).head
+
+      //If they have more health than we have, we can't starve them
+      if(enemy.health_points > ourSnake.health_points){
+        return false
+      }
+
+      //If they're closer to the food, we can't beat 'em there
+      //Since A* is optimal this should always work
+      val theirPath = planner.planPath(enemy.coords.head,gameState.food.head)
+      val ourPath = planner.planPath(ourSnake.coords.head,gameState.food.head)
+      if(theirPath.length < ourPath.length){
+        return false
+      }
+
+      return true
+    }
+
+
+    def pathAroundPoint(point : Point, planner : AStar) : List[Point] = {
+      if(!snake.isDefined){
+        return List.empty
+      }
+
+      if(snake.get.coords.length < 7 && ((snake.get.coords.length % 2) != 0)){
+        return List.empty
+      }
+
+      //Make a rectangle with our body
+      val height = 2
+      val width = (snake.get.coords.length - 2) / 2
+
+      val nbs = planner.neighboursForNode(Node(point,0))
+      List.empty
     }
 
     //Do our little squiggly snake dance!

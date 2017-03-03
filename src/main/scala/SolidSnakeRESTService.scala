@@ -152,7 +152,7 @@ trait MyService extends HttpService {
             println(s"Started game with $game.game")
             GameController.createGame(game)            
             complete {
-                JsObject("name" -> JsString("ScalaSnake"),"color" -> JsString("blue"),"head_url" -> JsString("hhttps://tenor.co/uuXp.gif"),"taunt" -> JsString("DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE DANCE"))
+                JsObject("name" -> JsString("ScalaSnake"), "head_type" -> JsString("tongue"), "tail_type" -> JsString("curled"),"secondary_color" -> JsString("pink"), "color" -> JsString("blue"),"head_url" -> JsString("https://m.popkey.co/55940e/orAQD.gif"),"taunt" -> JsString("RESISTANCE IS FUTILE"))
             }
           }
         }        
