@@ -4,7 +4,7 @@
 		module="bountysnakeai-build"
 		revision="0.1-SNAPSHOT"
 		status="integration"
-		publication="20170224104812"
+		publication="20170302182952"
 		e:sbtVersion="0.13" e:scalaVersion="2.10"
 	>
 		<description>
@@ -38,6 +38,7 @@
 		<dependency org="org.scala-sbt" name="sbt" rev="0.13.8" conf="provided->default(compile)"/>
 		<dependency org="io.spray" name="sbt-revolver" rev="0.7.2" conf="compile->default(compile)" e:sbtVersion="0.13" e:scalaVersion="2.10"/>
 		<dependency org="com.typesafe.sbt" name="sbt-twirl" rev="1.1.1" conf="compile->default(compile)" e:sbtVersion="0.13" e:scalaVersion="2.10"/>
+		<dependency org="com.typesafe.sbt" name="sbt-native-packager" rev="1.2.0-M8" conf="compile->default(compile)" e:sbtVersion="0.13" e:scalaVersion="2.10"/>
 		<override org="org.scala-lang" module="scala-library" matcher="exact" rev="2.10.4"/>
 		<override org="org.scala-lang" module="scala-compiler" matcher="exact" rev="2.10.4"/>
 		<override org="org.scala-lang" module="scala-reflect" matcher="exact" rev="2.10.4"/>

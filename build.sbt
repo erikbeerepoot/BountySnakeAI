@@ -1,11 +1,13 @@
 lazy val root = (project in file(".")).
   settings(
-    name := "SolidSnake",
+    name := "ScalaSnake",
     version := "1.0",
     scalaVersion := "2.11.6",
     scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
 
-    libraryDependencies ++= {
+
+
+      libraryDependencies ++= {
       val akkaV = "2.3.9"
       val sprayV = "1.3.3"
       Seq(
@@ -21,5 +23,5 @@ lazy val root = (project in file(".")).
         "io.spray"            %%  "spray-json"    % "1.3.2"
       )
     }
-  ).enablePlugins(SbtTwirl)
+  ).enablePlugins(SbtTwirl,JavaAppPackaging)
   Revolver.settings
