@@ -16,6 +16,8 @@ object Boot extends App {
   val service = system.actorOf(Props[MyServiceActor], "SolidSnake-REST-Service")
 
   implicit val timeout = Timeout(5.seconds)
+  
   // start a new HTTP server on port 8080 with our service actor as the handler
-  IO(Http) ? Http.Bind(service, interface = "0.0.0.0", port = 8080)
+  val port  = scala.util.Properties.envOrElse("PORT", "8080")
+  IO(Http) ? Http.Bind(service, interface = "0.0.0.0", port = port.toInt)
 }
