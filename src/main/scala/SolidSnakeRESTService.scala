@@ -80,7 +80,7 @@ trait MyService extends HttpService {
     //Endpoint used to get the game state for a given game
     path("move"){
             post {
-              logRequest("move", akka.event.Logging.InfoLevel)) {
+              logRequest("move", akka.event.Logging.InfoLevel) {
                 entity(as[Game]) { game =>
                   if (GameController.lookupGameById(game.game_id) == None) {
                     println("Could not find game. Creating...")
