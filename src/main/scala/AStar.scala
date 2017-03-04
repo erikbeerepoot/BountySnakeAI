@@ -61,11 +61,11 @@ class AStar(var grid : Grid[Double]){
        snake => grid.addPoints(snake.coords,Enemy.cost) 
       }
 
-      println("==-=-=-=-=-=-=-=-=-=-==")
-      println("==-= Board state: -=-==")
-      println("==-=-=-=-=-=-=-=-=-=-==")
-      grid.printGrid(List.empty)
-      println("==-=-=-=-=-=-=-=-=-=-==")
+//      println("==-=-=-=-=-=-=-=-=-=-==")
+//      println("==-= Board state: -=-==")
+//      println("==-=-=-=-=-=-=-=-=-=-==")
+//      grid.printGrid(List.empty)
+//      println("==-=-=-=-=-=-=-=-=-=-==")
     } 
 
     def planPathWithFailedMessage(start : Point, goal : Point, failedMessage : String) : List[Point] = { 
@@ -96,11 +96,11 @@ class AStar(var grid : Grid[Double]){
         while(!openSet.isEmpty){
           val current = openSet.dequeue()
           if(current.point == goal){
-            println("==-=-=-=-=-=-=-=-==")
-            println("==-= G Score: -=-==")
-            println("==-=-=-=-=-=-=-=-==")
-            g_score.printGrid(ourSnake)
-            println("-=-=-=-=-=-=-=-=-=-")
+//            println("==-=-=-=-=-=-=-=-==")
+//            println("==-= G Score: -=-==")
+//            println("==-=-=-=-=-=-=-=-==")
+//            g_score.printGrid(ourSnake)
+//            println("-=-=-=-=-=-=-=-=-=-")
 
 
             return reconstructPath(originGrid,start,goal)
