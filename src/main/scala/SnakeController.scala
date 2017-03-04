@@ -4,7 +4,7 @@ import PointJsonProtocol._
 case class SnakeController(var gameState : Game){
     object SnakeState extends Enumeration {
       type SnakeState = Value
-      val TargetFood, Squiggle, MoveToKill , Dance = Value
+      val TargetFood, Squiggle, MoveToKill, Dance = Value
     }
 
     //Technically fixed, but at request time so var
@@ -16,9 +16,6 @@ case class SnakeController(var gameState : Game){
 
     //Keeps track of the costs of each square
     var costGrid : Grid[Double] = Grid[Double](gameState.width,gameState.height)
-
-    var killPath = List[Point]()
-    var killPathIndex = 0
 
     //update the state of the game from our model
     def updateState(gameState : Game){
@@ -54,8 +51,11 @@ case class SnakeController(var gameState : Game){
       planner.buildGrid(snake.head,enemies,gameState.dead_snakes,gameState.food,List.empty,List.empty)
 
       //Run state machine
-      val state = determineState(planner)
+      var state = determineState(planner)
       printCompleteState(state)
+
+      var killPath = List[Point]()
+      var killPathIndex = 0
 
       state match {
         case SnakeState.TargetFood => {
@@ -68,11 +68,52 @@ case class SnakeController(var gameState : Game){
           path = squiggle(planner)
         }
         case SnakeState.MoveToKill => {
-          path = List.empty
-//          val killPath = pathAroundPoint(gameState.food.head)
-//          path = planner.planPath(snake.get.coords.head,killPath.head)
+          //We need to erase the food, otherwise we will accidentally eat the food
+          planner.buildGrid(snake.head,enemies,gameState.dead_snakes,List.empty,List.empty,List.empty)
+
+          //Save killpath, and start at index 1, since A* takes us to the head of the path
+          killPath = pathAroundPoint(gameState.food.head)
+
+          //If we couldn't find a kill path, fall back to old planning methods
+          if(killPath.nonEmpty) {
+            //Are we currently on the killpath?
+            val nodeOnKillPath = killPath.filter(kpn => snake.get.coords.head == kpn)
+            val onKillPath = nodeOnKillPath.nonEmpty
+
+            //If we are, filter the killpath to only include the next few nodes as candidates
+            //Otherwise we will try to turn back on ourselves
+            var filteredKillPath = killPath
+            if(onKillPath){
+              val indexOfNodeOnKillPath = killPath.indexOf(nodeOnKillPath.head)
+              filteredKillPath = killPath.slice(indexOfNodeOnKillPath+1,killPath.length)
+
+              //If the path is empty, we reached the end of the list. First node is the one we want
+              if(filteredKillPath.isEmpty){
+                filteredKillPath = List[Point](killPath.head)
+              }
+            }
+
+            //Figure out which is the closest, but not 0
+            var distances = filteredKillPath.map(p => AStar.manhattanDistance(snake.get.coords.head,p))
+            distances = distances.filterNot(d => d == 0)
+            val minDistance = distances.min
+
+            //Figure out what our next move should be
+            killPathIndex = distances.indexOf(minDistance)
+
+
+            if(onKillPath){
+              println("KILL KILL KILL")
+              //Next segment on the killpath
+              path = List[Point](filteredKillPath(killPathIndex))
+            } else {
+              //Plan a path to the start of the kill path. If it's empty -> switch to actually following the path
+              path = planner.planPath(snake.get.coords.head, killPath.head)
+            }
+          }
         }
-      } 
+      }
+
 
       if(path.isEmpty){
         println("Unable to plan path using the normal methods. Attempting to follow our tail!")
@@ -102,12 +143,12 @@ case class SnakeController(var gameState : Game){
         return SnakeState.Dance
       }
 
-//      if(canKill(planner)){
-//        val killPath = pathAroundPoint(gameState.food.head)
-//        if(killPath.nonEmpty){
-//            return SnakeState.MoveToKill
-//        }
-//      }
+      if(canKill(planner)){
+        val killPath = pathAroundPoint(gameState.food.head)
+        if(killPath.nonEmpty){
+            return SnakeState.MoveToKill
+        }
+      }
 
       //If we're desperate for food, or we're not very long -> get food
       if(snake.get.health_points < (20 + Math.min(snake.get.coords.length,30)) || snake.get.coords.length < 25){
@@ -154,13 +195,12 @@ case class SnakeController(var gameState : Game){
       }
 
       //If they're closer to the food, we can't beat 'em there
-      //Since A* is optimal this should always work
+      //Since A* is optimal this should always work. When we have the food surrounded their path will be empty
       val theirPath = planner.planPath(enemy.coords.head,gameState.food.head)
       val ourPath = planner.planPath(ourSnake.coords.head,gameState.food.head)
-      if(theirPath.length < (ourPath.length + 4)){ //4 is just a buffer so we have time to start surrounding the food
+      if(theirPath.length < ourPath.length && theirPath.nonEmpty){
         return false
       }
-
       return true
     }
 
@@ -180,9 +220,8 @@ case class SnakeController(var gameState : Game){
       }
 
       if(snake.get.coords.length == 10) {
-        path = List[Point](Point(point.x - 2, point.y + 1), Point(point.x - 1, point.y + 1), Point(point.x, point.y + 1), Point(point.x + 1, point.y + 1), Point(point.x + 1, point.y), Point(point.x + 1, point.y - 1), Point(point.x, point.y - 1), Point(point.x - 1, point.y - 1),Point(point.x - 2, point.y - 1), Point(point.x - 1, point.y))
+        path = List[Point](Point(point.x - 2, point.y + 1), Point(point.x - 1, point.y + 1), Point(point.x, point.y + 1), Point(point.x + 1, point.y + 1), Point(point.x + 1, point.y), Point(point.x + 1, point.y - 1), Point(point.x, point.y - 1), Point(point.x - 1, point.y - 1),Point(point.x - 2, point.y - 1), Point(point.x - 2, point.y))
       }
-
 
       path.foreach(point => {
         if(point.x < 0 || point.x > (gameState.width - 1)){

@@ -97,7 +97,7 @@ trait MyService extends HttpService {
                       val nextMove = snakeController.getNextMove()                    
                       respondWithMediaType(`application/json`) {
                         complete {
-                          JsObject("move" -> JsString(nextMove),"taunt" -> JsString("suck mah balls"))
+                          JsObject("move" -> JsString(nextMove),"taunt" -> JsString("EAT MY SNAKE"))
                         }
                       }
                     }
