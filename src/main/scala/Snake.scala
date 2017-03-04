@@ -5,7 +5,7 @@ import spray.json._
 import DefaultJsonProtocol._
 import PointJsonProtocol._
 
-case class Snake(val name : String,val id : String,var coords : List[Point], val taunt : String, val health_points : Int)
+case class Snake(val name : String,val id : String,var coords : List[Point], val taunt : Option[String], val health_points : Int)
 
 object SnakeJsonProtocol extends DefaultJsonProtocol {
   implicit val snakeFormat = jsonFormat5(Snake)

@@ -78,32 +78,34 @@ trait MyService extends HttpService {
       }
     } ~
     //Endpoint used to get the game state for a given game
-    path("move"){          
-            post {              
+    path("move"){
+            post {
+              logRequest("move", akka.event.Logging.InfoLevel)) {
                 entity(as[Game]) { game =>
-                  if(GameController.lookupGameById(game.game_id) == None){
-                    println("Could not find game. Creating...")                
-                    GameController.createGame(game)                          
+                  if (GameController.lookupGameById(game.game_id) == None) {
+                    println("Could not find game. Creating...")
+                    GameController.createGame(game)
                   }
-                  
+
                   GameController.snakeControllerForGame(game.game_id) match {
-                    case Some(snakeController) => {                                      
+                    case Some(snakeController) => {
                       //Update our game state
-                      snakeController.updateState(game)                  
+                      snakeController.updateState(game)
 
                       //Plan the next path
-                      snakeController.planPath()  
+                      snakeController.planPath()
 
-                      val nextMove = snakeController.getNextMove()                    
+                      val nextMove = snakeController.getNextMove()
                       respondWithMediaType(`application/json`) {
                         complete {
-                          JsObject("move" -> JsString(nextMove),"taunt" -> JsString("EAT MY SNAKE"))
+                          JsObject("move" -> JsString(nextMove), "taunt" -> JsString("EAT MY SNAKE"))
                         }
                       }
                     }
-                    case None => complete(StatusCodes.OK,"Error occurred retrieving snake controller")
+                    case None => complete(StatusCodes.OK, "Error occurred retrieving snake controller")
+                  }
                 }
-            }
+              }
            }
     } ~
     pathPrefix("game" ){ 
