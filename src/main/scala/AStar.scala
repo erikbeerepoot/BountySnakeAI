@@ -180,9 +180,9 @@ class AStar(var grid : Grid[Double]){
       })
 
       //Handle dead snakes separately
-      deadEnemies.foreach(enemy => {
-        neighbours = neighbours.filter(neighbour => !enemy.coords.contains(neighbour))      
-      })
+//      deadEnemies.foreach(enemy => {
+//        neighbours = neighbours.filter(neighbour => !enemy.coords.contains(neighbour))
+//      })
 
       //Search for convex sets inside of loops
       if(cavityPoints.nonEmpty) {
