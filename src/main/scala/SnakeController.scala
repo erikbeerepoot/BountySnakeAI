@@ -4,7 +4,7 @@ import PointJsonProtocol._
 case class SnakeController(var gameState : Game){
     object SnakeState extends Enumeration {
       type SnakeState = Value
-      val TargetFood, Squiggle, Dance = Value    
+      val TargetFood, Squiggle, MoveToKill , Dance = Value
     }
 
     //Technically fixed, but at request time so var
@@ -16,6 +16,9 @@ case class SnakeController(var gameState : Game){
 
     //Keeps track of the costs of each square
     var costGrid : Grid[Double] = Grid[Double](gameState.width,gameState.height)
+
+    var killPath = List[Point]()
+    var killPathIndex = 0
 
     //update the state of the game from our model
     def updateState(gameState : Game){
@@ -62,10 +65,14 @@ case class SnakeController(var gameState : Game){
           path = dance(planner)      
         }
         case SnakeState.Squiggle => {
-          path = squiggle(planner)      
+          path = squiggle(planner)
+        }
+        case SnakeState.MoveToKill => {
+          path = List.empty
+//          val killPath = pathAroundPoint(gameState.food.head)
+//          path = planner.planPath(snake.get.coords.head,killPath.head)
         }
       } 
-
 
       if(path.isEmpty){
         println("Unable to plan path using the normal methods. Attempting to follow our tail!")
@@ -95,8 +102,12 @@ case class SnakeController(var gameState : Game){
         return SnakeState.Dance
       }
 
-      val canKillOtherSnake = canKill(planner)
-      println(s"canKill: $canKillOtherSnake")
+//      if(canKill(planner)){
+//        val killPath = pathAroundPoint(gameState.food.head)
+//        if(killPath.nonEmpty){
+//            return SnakeState.MoveToKill
+//        }
+//      }
 
       //If we're desperate for food, or we're not very long -> get food
       if(snake.get.health_points < (20 + Math.min(snake.get.coords.length,30)) || snake.get.coords.length < 25){
@@ -146,7 +157,7 @@ case class SnakeController(var gameState : Game){
       //Since A* is optimal this should always work
       val theirPath = planner.planPath(enemy.coords.head,gameState.food.head)
       val ourPath = planner.planPath(ourSnake.coords.head,gameState.food.head)
-      if(theirPath.length < ourPath.length){
+      if(theirPath.length < (ourPath.length + 4)){ //4 is just a buffer so we have time to start surrounding the food
         return false
       }
 
@@ -154,21 +165,36 @@ case class SnakeController(var gameState : Game){
     }
 
 
-    def pathAroundPoint(point : Point, planner : AStar) : List[Point] = {
+    //Quick hack to plan a simple path around a point
+    def pathAroundPoint(point : Point) : List[Point] = {
       if(!snake.isDefined){
         return List.empty
       }
 
-      if(snake.get.coords.length < 7 && ((snake.get.coords.length % 2) != 0)){
-        return List.empty
+      var path = List[Point]()
+
+      //Rather than coming up with a fancy algorithm to create rectangles, we probably wont have much luck with large rectangles.
+      // ---> We craft an artisanal rectangle
+      if(snake.get.coords.length == 8) {
+        path = List[Point](Point(point.x - 1, point.y + 1), Point(point.x, point.y + 1), Point(point.x + 1, point.y + 1), Point(point.x + 1, point.y), Point(point.x + 1, point.y - 1), Point(point.x, point.y - 1), Point(point.x - 1, point.y - 1), Point(point.x - 1, point.y))
       }
 
-      //Make a rectangle with our body
-      val height = 2
-      val width = (snake.get.coords.length - 2) / 2
+      if(snake.get.coords.length == 10) {
+        path = List[Point](Point(point.x - 2, point.y + 1), Point(point.x - 1, point.y + 1), Point(point.x, point.y + 1), Point(point.x + 1, point.y + 1), Point(point.x + 1, point.y), Point(point.x + 1, point.y - 1), Point(point.x, point.y - 1), Point(point.x - 1, point.y - 1),Point(point.x - 2, point.y - 1), Point(point.x - 1, point.y))
+      }
 
-      val nbs = planner.neighboursForNode(Node(point,0))
-      List.empty
+
+      path.foreach(point => {
+        if(point.x < 0 || point.x > (gameState.width - 1)){
+          return List.empty
+        }
+
+        if(point.y < 0 || point.y > (gameState.height - 1)){
+          return List.empty
+        }
+      })
+
+      return path
     }
 
     //Do our little squiggly snake dance!
